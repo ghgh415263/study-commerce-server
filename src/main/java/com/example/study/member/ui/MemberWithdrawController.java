@@ -1,7 +1,7 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.common.Authentication.LoginMemberContext;
+import com.example.study.common.authentication.LoginMemberContext;
 import com.example.study.member.command.application.MemberWithdrawService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

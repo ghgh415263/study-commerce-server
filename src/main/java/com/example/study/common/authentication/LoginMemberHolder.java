@@ -1,4 +1,4 @@
-package com.example.study.common.Authentication;
+package com.example.study.common.authentication;
 
 /**
  * 현재 로그인한 사용자의 ID를 요청 처리 중 보관하기 위한 유틸리티 클래스입니다.

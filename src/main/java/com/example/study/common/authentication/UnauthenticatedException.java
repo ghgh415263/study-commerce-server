@@ -1,4 +1,4 @@
-package com.example.study.common.Authentication;
+package com.example.study.common.authentication;
 
 import com.example.study.common.CustomException;
 import org.springframework.http.HttpStatus;

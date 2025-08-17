@@ -1,4 +1,4 @@
-package com.example.study.common.Authentication;
+package com.example.study.common.authentication;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

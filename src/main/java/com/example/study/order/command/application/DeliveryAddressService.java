@@ -1,6 +1,6 @@
 package com.example.study.order.command.application;
 
-import com.example.study.common.Authentication.LoginMemberContext;
+import com.example.study.common.authentication.LoginMemberContext;
 import com.example.study.order.command.domain.AddressVO;
 import com.example.study.order.command.domain.DeliveryAddress;
 import com.example.study.order.command.domain.DeliveryAddressRepository;
