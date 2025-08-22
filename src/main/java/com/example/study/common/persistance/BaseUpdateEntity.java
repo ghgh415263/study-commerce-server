@@ -31,5 +31,5 @@ public abstract class BaseUpdateEntity extends BaseEntity {
      */
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime modifiedTime;
+    private LocalDateTime modifiedAt;
 }

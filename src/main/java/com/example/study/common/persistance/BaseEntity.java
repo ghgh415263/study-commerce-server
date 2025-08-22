@@ -31,5 +31,5 @@ public abstract class BaseEntity {
      */
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    private LocalDateTime createdTime;
+    private LocalDateTime createdAt;
 }

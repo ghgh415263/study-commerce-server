@@ -1,4 +1,4 @@
-package com.example.study.common;
+package com.example.study.common.authentication;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
