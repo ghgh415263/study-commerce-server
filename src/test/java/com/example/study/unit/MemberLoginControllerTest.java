@@ -1,5 +1,7 @@
 package com.example.study.unit;
 
+import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.AuthenticationConstant;
 import com.example.study.member.command.application.MemberLoginService;
 import com.example.study.member.ui.MemberLoginController;
 import jakarta.servlet.http.HttpSession;
@@ -32,7 +34,7 @@ class MemberLoginControllerTest {
     private MemberLoginService memberLoginService;
 
     @Test
-    @DisplayName("로그인 성공해서 세션에 id가 저장되고 응답은 200")
+    @DisplayName("로그인 성공해서 세션에 Authentication가 저장되고 응답은 200")
     void loginSuccessful_storesIdInSession_ReturnsSuccess() throws Exception {
         // given
         UUID mockId = UUID.randomUUID();
@@ -53,6 +55,7 @@ class MemberLoginControllerTest {
         // then: 세션에 loginId 저장되었는지 확인
         HttpSession session = result.getRequest().getSession(false);
         assertThat(session).isNotNull();
-        assertThat(session.getAttribute("loginId")).isEqualTo(mockId.toString());
+		Authentication authentication = (Authentication) session.getAttribute(AuthenticationConstant.AUTHENTICATION);
+        assertThat(authentication.getMemberId()).isEqualTo(mockId);
     }
 }

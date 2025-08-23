@@ -1,5 +1,8 @@
 package com.example.study.unit;
 
+import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.BackOfficeAuthentication;
+import com.example.study.common.authentication.BackoffIceAuthenticationConstant;
 import com.example.study.member.command.application.BackofficeMemberLoginService;
 import com.example.study.member.ui.BackofficeMemberLoginController;
 import jakarta.servlet.http.HttpSession;
@@ -51,6 +54,7 @@ public class BackofficeMemberLoginControllerTest {
         // then: 세션에 backofficeLoginId 저장되었는지 확인
         HttpSession session = result.getRequest().getSession(false);
         assertThat(session).isNotNull();
-        assertThat(session.getAttribute("backofficeLoginId")).isEqualTo(mockId.toString());
+        BackOfficeAuthentication authentication = (BackOfficeAuthentication) session.getAttribute(BackoffIceAuthenticationConstant.BACKOFFICE_AUTHENTICATION);
+        assertThat(authentication.getBackofficeMemberId()).isEqualTo(mockId);
     }
 }

@@ -10,25 +10,25 @@ package com.example.study.common.authentication;
  * 이 클래스는 {@code package-private} 접근 제한으로
  * 같은 패키지 내에서만 사용하도록 설계되었습니다.
  * 외부 패키지(예: service, controller)에서는 직접 호출하지 말고,
- * {@link BackofficeLoginMemberContext}를 통해
+ * {@link BackofficeAuthenticationContext}를 통해
  * 사용자 정보를 조회해야 합니다.
  */
-class BackofficeLoginMemberHolder {
+class BackofficeAuthenticationHolder {
 
-    private static final ThreadLocal<String> BackofficeLoginIdHolder = new ThreadLocal<>();
+    private static final ThreadLocal<BackOfficeAuthentication> BackofficeAuthenticationHolder = new ThreadLocal<>();
 
-    public static void set(String loginId) {
-        BackofficeLoginIdHolder.set(loginId);
+    public static void set(BackOfficeAuthentication authentication) {
+        BackofficeAuthenticationHolder.set(authentication);
     }
 
-    public static String get() {
-        return BackofficeLoginIdHolder.get();
+    public static BackOfficeAuthentication get() {
+        return BackofficeAuthenticationHolder.get();
     }
 
     public static void clear() {
-        BackofficeLoginIdHolder.remove();
+        BackofficeAuthenticationHolder.remove();
     }
 
-    private BackofficeLoginMemberHolder() {
+    private BackofficeAuthenticationHolder() {
     }
 }

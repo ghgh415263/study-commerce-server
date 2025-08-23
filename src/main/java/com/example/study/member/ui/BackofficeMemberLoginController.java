@@ -1,6 +1,8 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
+import com.example.study.common.authentication.BackOfficeAuthentication;
+import com.example.study.common.authentication.BackoffIceAuthenticationConstant;
 import com.example.study.member.command.application.BackofficeMemberLoginDto;
 import com.example.study.member.command.application.BackofficeMemberLoginService;
 import jakarta.servlet.http.HttpSession;
@@ -26,7 +28,7 @@ public class BackofficeMemberLoginController {
             HttpSession session
     ) {
         UUID loginedMemberId = backofficeMemberLoginService.login(dto);
-        session.setAttribute("backofficeLoginId", loginedMemberId.toString());
+        session.setAttribute(BackoffIceAuthenticationConstant.BACKOFFICE_AUTHENTICATION, new BackOfficeAuthentication(loginedMemberId));
 
         return ApiSuccessResponse.empty();
     }

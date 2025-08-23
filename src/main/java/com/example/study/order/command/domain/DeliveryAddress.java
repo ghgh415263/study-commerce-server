@@ -28,8 +28,8 @@ public class DeliveryAddress extends BaseUpdateEntity {
     @Embedded
     private AddressVO address;
 
-    public DeliveryAddress(String memberId, String name, AddressVO address) {
-        this.memberId = UUID.fromString(memberId);
+    public DeliveryAddress(UUID memberId, String name, AddressVO address) {
+        this.memberId = memberId;
         this.name = name;
         this.address = address;
     }
