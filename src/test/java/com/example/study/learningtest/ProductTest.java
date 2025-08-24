@@ -40,7 +40,7 @@ public class ProductTest {
         ProductTag pt1 = new ProductTag("핸드폰");
         ProductTag pt2 = new ProductTag("삼성");
         ProductTag pt3 = new ProductTag("플래그쉽");
-        Product product = new Product("갤럭시S25", 1520000, 3);
+        Product product = new Product("갤럭시S25", 1520000, 3,"갤럭시");
         product.setProductTags(pt1);
         product.setProductTags(pt2);
         product.setProductTags(pt3);
@@ -53,7 +53,7 @@ public class ProductTest {
         em.clear();
 
         // then
-        Product foundEntity = productRepository.findById(saved.getId()).orElseThrow(DeliveryAddressNotFoundException::new);
+        Product foundEntity = productRepository.findByProductId(saved.getId()).orElseThrow(DeliveryAddressNotFoundException::new);
 
         assertThat(foundEntity.getName()).isEqualTo("갤럭시S25");
         assertThat(foundEntity.getPrice()).isEqualTo(1520000);
