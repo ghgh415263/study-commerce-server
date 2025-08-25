@@ -38,7 +38,7 @@ public class DeliveryAddressTest {
         // given
         UUID memberId = UUID.randomUUID();
         AddressVO address = new AddressVO("06000", "서울 강남구", "101호");
-        DeliveryAddress deliveryAddress = new DeliveryAddress(memberId.toString(), "우리집", address);
+        DeliveryAddress deliveryAddress = new DeliveryAddress(memberId, "우리집", address);
         DeliveryAddress saved = deliveryAddressRepository.save(deliveryAddress);
 
         em.flush();

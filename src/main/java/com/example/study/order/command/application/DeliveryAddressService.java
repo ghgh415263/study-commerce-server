@@ -1,6 +1,6 @@
 package com.example.study.order.command.application;
 
-import com.example.study.common.authentication.LoginMemberContext;
+import com.example.study.common.authentication.AuthenticationContext;
 import com.example.study.order.command.domain.AddressVO;
 import com.example.study.order.command.domain.DeliveryAddress;
 import com.example.study.order.command.domain.DeliveryAddressRepository;
@@ -15,7 +15,7 @@ public class DeliveryAddressService {
 
     private final DeliveryAddressRepository deliveryAddressRepository;
 
-    private final LoginMemberContext loginMemberContext;
+    private final AuthenticationContext authenticationContext;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long saveDeliveryAddress(DeliveryAddressDto dto) {
@@ -25,7 +25,7 @@ public class DeliveryAddressService {
                 dto.detailAddress()
         );
 
-        DeliveryAddress deliveryAddress = new DeliveryAddress(loginMemberContext.getLoginId(), dto.name(), addressVO);
+        DeliveryAddress deliveryAddress = new DeliveryAddress(authenticationContext.getAuthentication().getMemberId(), dto.name(), addressVO);
 
         return deliveryAddressRepository.save(deliveryAddress).getId();
     }
