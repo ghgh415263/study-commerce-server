@@ -17,7 +17,6 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorColumn(name = "product_type", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("PRODUCT")
 public class Product extends BaseUpdateEntity {
 
     @Id

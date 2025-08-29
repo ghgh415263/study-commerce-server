@@ -29,14 +29,14 @@ public class DeliveryProduct extends Product {
         this.weight = weight;
     }
 
-    public static DeliveryProduct fromProduct(Product parent, int fee, int weight) {
+    public static DeliveryProduct fromProduct(Product product, int fee, int weight) {
         return new DeliveryProduct(
-                parent.getName(),
-                parent.getPrice(),
-                parent.getStockQuantity(),
-                parent.getDescription(),
-                parent.getProductStatus().name(),
-                parent.getProductTags(),
+                product.getName(),
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getDescription(),
+                product.getProductStatus().name(),
+                product.getProductTags(),
                 fee,
                 weight
         );
@@ -47,7 +47,7 @@ public class DeliveryProduct extends Product {
     }
 
     public void setWeight(int weight){
-        this.fee = weight;
+        this.weight = weight;
     }
 
 }

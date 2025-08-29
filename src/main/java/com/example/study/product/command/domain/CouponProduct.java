@@ -29,14 +29,14 @@ public class CouponProduct extends Product {
         this.effectiveDay = effectiveDay;
     }
 
-    public static CouponProduct fromProduct(Product parent, int discountPrice, int effectiveDay) {
+    public static CouponProduct fromProduct(Product product, int discountPrice, int effectiveDay) {
         return new CouponProduct(
-                parent.getName(),
-                parent.getPrice(),
-                parent.getStockQuantity(),
-                parent.getDescription(),
-                parent.getProductStatus().name(),
-                parent.getProductTags(),
+                product.getName(),
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getDescription(),
+                product.getProductStatus().name(),
+                product.getProductTags(),
                 discountPrice,
                 effectiveDay
         );

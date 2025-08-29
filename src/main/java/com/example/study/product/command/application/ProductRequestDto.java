@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record ProductDto(
+public record ProductRequestDto(
 
         @NotBlank(message = "상품 이름은 필수입니다.")
         String name,

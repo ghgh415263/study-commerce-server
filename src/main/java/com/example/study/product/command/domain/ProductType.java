@@ -4,9 +4,6 @@ package com.example.study.product.command.domain;
  * 상품의 종류를 나타내는 열거형입니다.
  */
 public enum ProductType {
-    /** 일반 상품 */
-    PRODUCT,
-
     /** 배송형 상품 */
     DELIVERY,
 

@@ -13,82 +13,127 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    /**
+     * 상품 상세 조회
+     * @param productId
+     * @return
+     */
     @Transactional
-    public Long saveProduct(ProductDto dto){
+    public ProductResponseDto getProduct(Long productId){
+        Product product = productRepository.findByProductId(productId).orElseThrow(ProductNotFoundException::new);
 
-        /* 상품 정보 등록 */
-        Product product = new Product(dto.name(), dto.price(), dto.stockQuantity(), dto.description());
+        if(product instanceof DeliveryProduct){
+            return ProductResponseDto.deliveryProduct(product, ProductType.DELIVERY.name());
+        } else if(product instanceof CouponProduct){
+            return ProductResponseDto.couponProduct(product, ProductType.COUPON.name());
+        } else {
+            throw new ProductNotFoundException();
+        }
+    }
+
+
+    /**
+     * 상품 기본 정보 저장
+     * @param dto
+     * @return 저장된 상품 엔티티
+     */
+    private Product saveProduct(ProductRequestDto dto){
+        Product product = new Product(
+                dto.name()
+                , dto.price()
+                , dto.stockQuantity()
+                , dto.description());
+
         product.setProductStatus(dto.productStatus());
+
         for(ProductTagDto productTag : dto.productTags()){
             product.setProductTags(new ProductTag(productTag.tagName()));
         }
-
-        /* 상품 타입별 정보 등록 */
-        ProductType productType = ProductType.from(dto.productType());
-        if(ProductType.DELIVERY == productType){
-            DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(product, dto.deliveryProduct().fee(), dto.deliveryProduct().weight());
-            return productRepository.save(delivertProduct).getId();
-        } else if(ProductType.COUPON == productType){
-            CouponProduct couponProduct = CouponProduct.fromProduct(product, dto.couponProduct().discountPrice(), dto.couponProduct().effectiveDay());
-            return productRepository.save(couponProduct).getId();
-        } else { /* ProductType.PRODUCT */
-            return productRepository.save(product).getId();
-        }
+        return product;
     }
 
+    /**
+     * 배송형 상품 저장
+     * @param dto
+     * @return 저장된 배송형 상품 Id
+     */
     @Transactional
-    public void updateProduct(Long productId, ProductDto dto){
-        /* 상품 정보 조회 및 수정*/
-//        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
-//        product.update(dto.name(), dto.price(), dto.stockQuantity(), dto.description(), dto.productStatus());
-//        for(ProductTagDto productTag : dto.productTags()){
-//            product.setProductTags(new ProductTag(productTag.tagName()));
-//        }
-
-        /* 상품 타입별 정보 조회 후 처리 */
-//        if (product instanceof DeliveryProduct deliveryProduct) {
-//            deliveryProduct.setFee(dto.deliveryProduct().fee());
-//            deliveryProduct.setWeight(dto.deliveryProduct().weight());
-//        } else if (product instanceof CouponProduct couponProduct) {
-//            couponProduct.setDiscountPrice(dto.couponProduct().discountPrice());
-//            couponProduct.setEffectiveDay(dto.couponProduct().effectiveDay());
-//        }
-
-        /* 상품 타입별 정보 조회 후 처리 */
-        ProductType productType = ProductType.from(dto.productType());
-        if(ProductType.DELIVERY == productType){
-            DeliveryProduct deliveryProduct = productRepository.findByDeliveryProductId(productId).orElseThrow(ProductNotFoundException::new);
-            deliveryProduct.update(dto.name(), dto.price(), dto.stockQuantity(), dto.description(), dto.productStatus());
-            List<ProductTag> newTags = dto.productTags().stream()
-                    .map(productTagDto -> new ProductTag(productTagDto.tagName()))
-                    .toList();
-            deliveryProduct.updateProductTags(deliveryProduct, newTags);
-
-            deliveryProduct.setFee(dto.deliveryProduct().fee());
-            deliveryProduct.setWeight(dto.deliveryProduct().weight());
-
-        } else if(ProductType.COUPON == productType){
-            CouponProduct couponProduct = productRepository.findByCouponProductId(productId).orElseThrow(ProductNotFoundException::new);
-            couponProduct.update(dto.name(), dto.price(), dto.stockQuantity(), dto.description(), dto.productStatus());
-            List<ProductTag> newTags = dto.productTags().stream()
-                    .map(productTagDto -> new ProductTag(productTagDto.tagName()))
-                    .toList();
-            couponProduct.updateProductTags(couponProduct, newTags);
-
-            couponProduct.setDiscountPrice(dto.couponProduct().discountPrice());
-            couponProduct.setEffectiveDay(dto.couponProduct().effectiveDay());
-
-        } else if(ProductType.PRODUCT == productType){
-            Product product = productRepository.findByProductId(productId).orElseThrow(ProductNotFoundException::new);
-            product.update(dto.name(), dto.price(), dto.stockQuantity(), dto.description(), dto.productStatus());
-            List<ProductTag> newTags = dto.productTags().stream()
-                    .map(productTagDto -> new ProductTag(productTagDto.tagName()))
-                    .toList();
-            product.updateProductTags(product, newTags);
-        }
-
+    public Long saveDeliveryProduct(ProductRequestDto dto){
+        DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(
+                saveProduct(dto)
+                , dto.deliveryProduct().fee()
+                , dto.deliveryProduct().weight());
+        return productRepository.save(delivertProduct).getId();
     }
 
+    /**
+     * 배송형 상품 수정
+     * @param productId
+     * @param dto
+     */
+    @Transactional
+    public void updateDeliveryProduct(Long productId, ProductRequestDto dto){
+        DeliveryProduct deliveryProduct = productRepository.findByDeliveryProductId(productId).orElseThrow(ProductNotFoundException::new);
+
+        deliveryProduct.update(
+                dto.name()
+                , dto.price()
+                , dto.stockQuantity()
+                , dto.description()
+                , dto.productStatus());
+
+        List<ProductTag> newTags = dto.productTags().stream()
+                .map(productTagDto -> new ProductTag(productTagDto.tagName()))
+                .toList();
+        deliveryProduct.updateProductTags(deliveryProduct, newTags);
+
+        deliveryProduct.setFee(dto.deliveryProduct().fee());
+        deliveryProduct.setWeight(dto.deliveryProduct().weight());
+    }
+
+    /**
+     * 쿠폰형 상품 저장
+     * @param dto
+     * @return 저장된 쿠폰형 상품 Id
+     */
+    @Transactional
+    public Long saveCouponProduct(ProductRequestDto dto){
+        CouponProduct couponProduct = CouponProduct.fromProduct(
+                saveProduct(dto)
+                , dto.couponProduct().discountPrice()
+                , dto.couponProduct().effectiveDay());
+        return productRepository.save(couponProduct).getId();
+    }
+
+    /**
+     * 쿠폰형 상품 수정
+     * @param productId
+     * @param dto
+     */
+    @Transactional
+    public void updateCouponProduct(Long productId, ProductRequestDto dto){
+        CouponProduct couponProduct = productRepository.findByCouponProductId(productId).orElseThrow(ProductNotFoundException::new);
+
+        couponProduct.update(
+                dto.name()
+                , dto.price()
+                , dto.stockQuantity()
+                , dto.description()
+                , dto.productStatus());
+
+        List<ProductTag> newTags = dto.productTags().stream()
+                .map(productTagDto -> new ProductTag(productTagDto.tagName()))
+                .toList();
+        couponProduct.updateProductTags(couponProduct, newTags);
+
+        couponProduct.setDiscountPrice(dto.couponProduct().discountPrice());
+        couponProduct.setEffectiveDay(dto.couponProduct().effectiveDay());
+    }
+
+    /**
+     * 상품 삭제
+     * @param productId
+     */
     @Transactional
     public void deleteProduct(Long productId){
         Product product = productRepository.findByProductId(productId).orElseThrow(ProductNotFoundException::new);
