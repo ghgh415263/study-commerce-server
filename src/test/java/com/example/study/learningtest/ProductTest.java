@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,77 +42,39 @@ public class ProductTest {
     }
 
     @Test
-    @DisplayName("상품을 저장한다")
-    void saveProduct() throws ProductNotFoundException {
-        // given
-        ProductTag pt1 = new ProductTag("핸드폰");
-        ProductTag pt2 = new ProductTag("삼성");
-        ProductTag pt3 = new ProductTag("플래그쉽");
-        Product product = new Product("갤럭시S25"
-                , 1520000
-                , 3
-                ,"갤럭시 상품입니다");
-        product.setProductStatus(ProductStatus.ON_SALE.name());
-        product.setProductTags(pt1);
-        product.setProductTags(pt2);
-        product.setProductTags(pt3);
-
-        // when
-        Product saved = productRepository.save(product);
-
-        // 영속성 컨텍스트 초기화 (flush + clear)
-        em.flush();
-        em.clear();
-
-        // then
-        Product foundEntity = productRepository.findByProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
-
-        assertThat(foundEntity.getName()).isEqualTo("갤럭시S25");
-        assertThat(foundEntity.getPrice()).isEqualTo(1520000);
-        assertThat(foundEntity.getStockQuantity()).isEqualTo(3);
-        assertThat(foundEntity.getDescription()).isEqualTo("갤럭시 상품입니다");
-        assertThat(foundEntity.getProductStatus().toString()).isEqualTo("ON_SALE");
-        List<String> tagList = foundEntity.getProductTags().stream().map(ProductTag::getTagName).collect(Collectors.toList());
-        assertThat(tagList).contains("핸드폰", "삼성", "플래그쉽");
-    }
-
-    @Test
     @DisplayName("배송형 상품을 저장한다")
     void saveDeliveryProduct() throws ProductNotFoundException {
         // given
         ProductTag pt1 = new ProductTag("일리");
         ProductTag pt2 = new ProductTag("커피캡슐");
-        Product product = new Product("일리머신&커피캡슐"
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
                 , 230000
                 , 2
-                ,"일리배송형 커피머신입니다.");
-        product.setProductStatus(ProductStatus.SOLD_OUT.name());
-        product.setProductTags(pt1);
-        product.setProductTags(pt2);
-
-        int fee = 1000;
-        int weight = 10;
-
-        DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(
-                product
-                , fee
-                , weight);
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+        deliveryProduct.assignProductTags(pt1);
+        deliveryProduct.assignProductTags(pt2);
 
         // when
-        Product saved = productRepository.save(delivertProduct);
+        Product saved = productRepository.save(deliveryProduct);
 
         // 영속성 컨텍스트 초기화 (flush + clear)
         em.flush();
         em.clear();
 
         // then
-        Product foundEntity = productRepository.findByProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct foundEntity = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
 
         assertThat(foundEntity.getName()).isEqualTo("일리머신&커피캡슐");
         assertThat(foundEntity.getPrice()).isEqualTo(230000);
         assertThat(foundEntity.getStockQuantity()).isEqualTo(2);
         assertThat(foundEntity.getDescription()).isEqualTo("일리배송형 커피머신입니다.");
         assertThat(foundEntity.getProductStatus().toString()).isEqualTo("SOLD_OUT");
+        assertThat(foundEntity.getFee()).isEqualTo(1000);
+        assertThat(foundEntity.getWeight()).isEqualTo(10);
+        assertThat(foundEntity.getDescription()).isEqualTo("일리배송형 커피머신입니다.");
         List<String> tagList = foundEntity.getProductTags().stream().map(ProductTag::getTagName).collect(Collectors.toList());
         assertThat(tagList).contains("일리", "커피캡슐");
     }
@@ -124,33 +85,27 @@ public class ProductTest {
         // given
         ProductTag pt1 = new ProductTag("일리");
         ProductTag pt2 = new ProductTag("커피캡슐");
-        Product product = new Product("일리머신&커피캡슐"
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
                 , 230000
                 , 2
-                ,"일리배송형 커피머신입니다.");
-        product.setProductStatus(ProductStatus.SOLD_OUT.name());
-        product.setProductTags(pt1);
-        product.setProductTags(pt2);
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+        deliveryProduct.assignProductTags(pt1);
+        deliveryProduct.assignProductTags(pt2);
 
-        int fee = 1000;
-        int weight = 10;
-
-        DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(
-                product
-                , fee
-                , weight);
-
-        Product saved = productRepository.save(delivertProduct);
+        // when
+        Product saved = productRepository.save(deliveryProduct);
 
         // 영속성 컨텍스트 초기화 (flush + clear)
         em.flush();
         em.clear();
 
         // when
-        DeliveryProduct deliveryProduct = productRepository.findByDeliveryProductId(saved.getId())
-                .orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct newDeliverProduct = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
 
-        deliveryProduct.update(
+        newDeliverProduct.update(
                 "네스프레소 머신"
                 ,310000
                 , 1
@@ -162,22 +117,21 @@ public class ProductTest {
         ProductTag newPt2 = new ProductTag("커피머신");
         newTags.add(newPt1);
         newTags.add(newPt2);
-        deliveryProduct.updateProductTags(deliveryProduct, newTags);
+        newDeliverProduct.updateProductTags(newDeliverProduct, newTags);
 
-        int newFee = 2000;
-        int newWeight = 20;
-
-        deliveryProduct.setFee(newFee);
-        deliveryProduct.setWeight(newWeight);
+        newDeliverProduct.assignFee(2000);
+        newDeliverProduct.assignWeight(20);
 
         // then
-        Product foundEntity = productRepository.findByProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct foundEntity = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
 
         assertThat(foundEntity.getName()).isEqualTo("네스프레소 머신");
         assertThat(foundEntity.getPrice()).isEqualTo(310000);
         assertThat(foundEntity.getStockQuantity()).isEqualTo(1);
         assertThat(foundEntity.getDescription()).isEqualTo("네스프레소 머신입니다");
         assertThat(foundEntity.getProductStatus().toString()).isEqualTo("ON_SALE");
+        assertThat(foundEntity.getFee()).isEqualTo(2000);
+        assertThat(foundEntity.getWeight()).isEqualTo(20);
         List<String> tagList = foundEntity.getProductTags().stream().map(ProductTag::getTagName).collect(Collectors.toList());
         assertThat(tagList).contains("네스프레소", "커피머신");
     }
@@ -188,30 +142,25 @@ public class ProductTest {
         // given
         ProductTag pt1 = new ProductTag("일리");
         ProductTag pt2 = new ProductTag("커피캡슐");
-        Product product = new Product("일리머신&커피캡슐"
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
                 , 230000
                 , 2
-                ,"일리배송형 커피머신입니다.");
-        product.setProductStatus(ProductStatus.SOLD_OUT.name());
-        product.setProductTags(pt1);
-        product.setProductTags(pt2);
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+        deliveryProduct.assignProductTags(pt1);
+        deliveryProduct.assignProductTags(pt2);
 
-        int fee = 1000;
-        int weight = 10;
-
-        DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(
-                product
-                , fee
-                , weight);
-
-        Product saved = productRepository.save(delivertProduct);
+        // when
+        Product saved = productRepository.save(deliveryProduct);
 
         // 영속성 컨텍스트 초기화 (flush + clear)
         em.flush();
         em.clear();
 
         // when
-        Product deleteProduct = productRepository.findByProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct deleteProduct = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
         productRepository.delete(deleteProduct);
 
         // 영속성 컨텍스트 초기화 (flush + clear)
@@ -231,13 +180,20 @@ public class ProductTest {
     @DisplayName("BackOffice Product 수정(조회)시에는 DB에 Lock을 건다(비관락)")
     void testProductFindLock() throws InterruptedException {
         // given
-        Product product = new Product("일리머신&커피캡슐", 230000, 2,"일리배송형 커피머신입니다.");
-        product.setProductStatus(ProductStatus.SOLD_OUT.name());
-        int fee = 0;
-        int weight = 0;
-        DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(product, fee, weight);
+        ProductTag pt1 = new ProductTag("일리");
+        ProductTag pt2 = new ProductTag("커피캡슐");
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
+                , 230000
+                , 2
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+        deliveryProduct.assignProductTags(pt1);
+        deliveryProduct.assignProductTags(pt2);
 
-        Product saved = productRepository.save(delivertProduct);
+        // when
+        Product saved = productRepository.save(deliveryProduct);
 
         // 영속성 컨텍스트 초기화 (flush + clear)
         em.flush();

@@ -31,27 +31,6 @@ public class ProductService {
         }
     }
 
-
-    /**
-     * 상품 기본 정보 저장
-     * @param dto
-     * @return 저장된 상품 엔티티
-     */
-    private Product saveProduct(ProductRequestDto dto){
-        Product product = new Product(
-                dto.name()
-                , dto.price()
-                , dto.stockQuantity()
-                , dto.description());
-
-        product.setProductStatus(dto.productStatus());
-
-        for(ProductTagDto productTag : dto.productTags()){
-            product.setProductTags(new ProductTag(productTag.tagName()));
-        }
-        return product;
-    }
-
     /**
      * 배송형 상품 저장
      * @param dto
@@ -59,10 +38,18 @@ public class ProductService {
      */
     @Transactional
     public Long saveDeliveryProduct(ProductRequestDto dto){
-        DeliveryProduct delivertProduct = DeliveryProduct.fromProduct(
-                saveProduct(dto)
+        DeliveryProduct delivertProduct = new DeliveryProduct(
+                dto.name()
+                , dto.price()
+                , dto.stockQuantity()
+                , dto.description()
+                , dto.productStatus()
                 , dto.deliveryProduct().fee()
-                , dto.deliveryProduct().weight());
+                , dto.deliveryProduct().weight()
+        );
+        for(ProductTagDto productTag : dto.productTags()){
+            delivertProduct.assignProductTags(new ProductTag(productTag.tagName()));
+        }
         return productRepository.save(delivertProduct).getId();
     }
 
@@ -87,8 +74,8 @@ public class ProductService {
                 .toList();
         deliveryProduct.updateProductTags(deliveryProduct, newTags);
 
-        deliveryProduct.setFee(dto.deliveryProduct().fee());
-        deliveryProduct.setWeight(dto.deliveryProduct().weight());
+        deliveryProduct.assignFee(dto.deliveryProduct().fee());
+        deliveryProduct.assignWeight(dto.deliveryProduct().weight());
     }
 
     /**
@@ -98,10 +85,18 @@ public class ProductService {
      */
     @Transactional
     public Long saveCouponProduct(ProductRequestDto dto){
-        CouponProduct couponProduct = CouponProduct.fromProduct(
-                saveProduct(dto)
+        CouponProduct couponProduct = new CouponProduct(
+                dto.name()
+                , dto.price()
+                , dto.stockQuantity()
+                , dto.description()
+                , dto.productStatus()
                 , dto.couponProduct().discountPrice()
-                , dto.couponProduct().effectiveDay());
+                , dto.couponProduct().effectiveDay()
+        );
+        for(ProductTagDto productTag : dto.productTags()){
+            couponProduct.assignProductTags(new ProductTag(productTag.tagName()));
+        }
         return productRepository.save(couponProduct).getId();
     }
 
@@ -126,8 +121,8 @@ public class ProductService {
                 .toList();
         couponProduct.updateProductTags(couponProduct, newTags);
 
-        couponProduct.setDiscountPrice(dto.couponProduct().discountPrice());
-        couponProduct.setEffectiveDay(dto.couponProduct().effectiveDay());
+        couponProduct.assignDiscountPrice(dto.couponProduct().discountPrice());
+        couponProduct.assignEffectiveDay(dto.couponProduct().effectiveDay());
     }
 
     /**

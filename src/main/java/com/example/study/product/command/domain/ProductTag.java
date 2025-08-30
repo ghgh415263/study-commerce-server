@@ -29,7 +29,7 @@ public class ProductTag extends BaseUpdateEntity {
         this.tagName = tagName;
     }
 
-    public void setProduct(Product product){
+    public void assignProduct(Product product){
         this.product = product;
     }
 }
