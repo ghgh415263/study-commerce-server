@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record ProductDto(
+public record ProductRequestDto(
 
         @NotBlank(message = "상품 이름은 필수입니다.")
         String name,
@@ -19,5 +19,17 @@ public record ProductDto(
         @Min(value = 1, message = "수량은 최소 {value} 이상이어야 합니다.")
         Integer stockQuantity,
 
-        List<ProductTagDto> productTags
+        String description,
+
+        @NotBlank(message = "상품 상태값은 필수 입니다.")
+        String productStatus,
+
+        List<ProductTagDto> productTags,
+
+        @NotBlank(message = "상품 타입은 필수 입니다.")
+        String productType,
+
+        DeliveryProductDto deliveryProduct,
+
+        CouponProductDto couponProduct
 ) {}
