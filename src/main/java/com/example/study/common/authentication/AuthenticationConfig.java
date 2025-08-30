@@ -1,8 +1,11 @@
 package com.example.study.common.authentication;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * 인증 관련 인터셉터를 등록하는 설정 클래스입니다.
@@ -25,5 +28,10 @@ public class AuthenticationConfig implements WebMvcConfigurer {
         registry.addInterceptor(new BackofficeLoginInterceptor())
                 .addPathPatterns("/backoffice/**")
                 .excludePathPatterns("/backoffice/login");
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.addAll(List.of(new AuthenticationArgumentResolver(), new BackofficeAuthenticationArgumentResolver()));
     }
 }
