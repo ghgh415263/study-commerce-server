@@ -1,9 +1,7 @@
 package com.example.study.product.command.domain;
 
 import com.example.study.common.persistance.BaseUpdateEntity;
-import com.example.study.member.command.domain.InvalidMemberStateException;
-import com.example.study.member.command.domain.MemberStatus;
-import com.example.study.product.command.application.InvalidProductColumnException;
+import com.example.study.product.command.application.InvalidProductParameterException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Entity
@@ -48,25 +45,17 @@ public abstract class Product extends BaseUpdateEntity {
     private List<ProductTag> productTags = new ArrayList<>();
 
     public Product(String name, int price, int stockQuantity, String description, String productStatus) {
-        validateNegative(Map.of(
-                "price", price,
-                "stockQuantity", stockQuantity
-        ));
         this.name = name;
-        this.price = price;
-        this.stockQuantity = stockQuantity;
+        assignPrice(price);
+        assignStockQuantity(stockQuantity);
         this.description = description;
         this.productStatus = ProductStatus.from(productStatus);
     }
 
     public void update(String name, int price, int stockQuantity, String description, String productStatus) {
-        validateNegative(Map.of(
-                "price", price,
-                "stockQuantity", stockQuantity
-        ));
         this.name = name;
-        this.price = price;
-        this.stockQuantity = stockQuantity;
+        assignPrice(price);
+        assignStockQuantity(stockQuantity);
         this.description = description;
         this.productStatus = ProductStatus.from(productStatus);
     }
@@ -82,15 +71,17 @@ public abstract class Product extends BaseUpdateEntity {
         newTags.forEach(product::assignProductTags);
     }
 
-    /**
-     * 엔티티 음수 체크
-     * @param columns
-     */
-    private void validateNegative(Map<String, Integer> columns) {
-        for (Map.Entry<String, Integer> entry : columns.entrySet()) {
-            if (entry.getValue() < 0) {
-                throw new InvalidProductColumnException(entry.getKey());
-            }
+    public void assignPrice(int price) {
+        if (price < 0) {
+            throw new InvalidProductParameterException("price는 음수가 될 수 없습니다.");
         }
+        this.price = price;
+    }
+
+    public void assignStockQuantity(int stockQuantity) {
+        if (stockQuantity < 0) {
+            throw new InvalidProductParameterException("stockQuantity는 음수가 될 수 없습니다.");
+        }
+        this.stockQuantity = stockQuantity;
     }
 }

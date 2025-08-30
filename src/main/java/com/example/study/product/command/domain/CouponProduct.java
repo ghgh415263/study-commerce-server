@@ -1,6 +1,6 @@
 package com.example.study.product.command.domain;
 
-import com.example.study.product.command.application.InvalidProductColumnException;
+import com.example.study.product.command.application.InvalidProductParameterException;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
-import java.util.List;
 import java.util.Map;
 
 @Audited
@@ -23,31 +22,22 @@ public class CouponProduct extends Product {
     public CouponProduct(String name, int price, int stockQuantity, String description, String productStatus,
                          int discountPrice, int effectiveDay){
         super(name, price, stockQuantity, description, productStatus);
-        validateNegative(Map.of(
-                "discountPrice", discountPrice,
-                "effectiveDay", effectiveDay
-        ));
-        this.discountPrice = discountPrice;
-        this.effectiveDay = effectiveDay;
+        assignDiscountPrice(discountPrice);
+        assignEffectiveDay(effectiveDay);
     }
 
     public void assignDiscountPrice(int discountPrice){
+        if (discountPrice < 0) {
+            throw new InvalidProductParameterException("할인가격은 음수일 수 없습니다.");
+        }
         this.discountPrice = discountPrice;
     }
 
     public void assignEffectiveDay(int effectiveDay){
+        if (effectiveDay < 0) {
+            throw new InvalidProductParameterException("사용기간은 음수일 수 없습니다.");
+        }
         this.effectiveDay = effectiveDay;
     }
 
-    /**
-     * 엔티티 음수 체크
-     * @param columns
-     */
-    private void validateNegative(Map<String, Integer> columns) {
-        for (Map.Entry<String, Integer> entry : columns.entrySet()) {
-            if (entry.getValue() < 0) {
-                throw new InvalidProductColumnException(entry.getKey());
-            }
-        }
-    }
 }

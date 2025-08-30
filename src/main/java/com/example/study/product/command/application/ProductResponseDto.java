@@ -6,8 +6,6 @@ import com.example.study.product.command.domain.Product;
 import com.example.study.product.command.domain.ProductTag;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +25,11 @@ public class ProductResponseDto {
     private String modifiedAt;
     private String modifiedBy;
     /* 쿠폰형 상품 */
-    private int discountPrice;
-    private int effectiveDay;
+    private Integer discountPrice;
+    private Integer effectiveDay;
     /* 배송형 상품 */
-    private int fee;
-    private int weight;
+    private Integer fee;
+    private Integer weight;
 
     /** 배송형 상품 생성자 **/
     public ProductResponseDto(DeliveryProduct deliveryProduct, String productType){

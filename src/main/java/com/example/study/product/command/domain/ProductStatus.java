@@ -1,5 +1,7 @@
 package com.example.study.product.command.domain;
 
+import com.example.study.product.command.application.InvalidProductParameterException;
+
 /**
  * 상품의 상태를 나타내는 열거형입니다.
  */
@@ -16,6 +18,6 @@ public enum ProductStatus {
                 return state;
             }
         }
-        throw new IllegalArgumentException("Unknown ProductStatus: " + value);
+        throw new InvalidProductParameterException("Unknown ProductStatus: " + value);
     }
 }

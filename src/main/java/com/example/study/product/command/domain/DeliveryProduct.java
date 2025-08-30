@@ -1,15 +1,12 @@
 package com.example.study.product.command.domain;
 
-import com.example.study.product.command.application.InvalidProductColumnException;
+import com.example.study.product.command.application.InvalidProductParameterException;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
-
-import java.util.List;
-import java.util.Map;
 
 @Audited
 @Entity
@@ -23,31 +20,21 @@ public class DeliveryProduct extends Product {
     public DeliveryProduct(String name, int price, int stockQuantity, String description, String productStatus,
                            int fee, int weight) {
         super(name, price, stockQuantity, description, productStatus);
-        validateNegative(Map.of(
-                "fee", fee,
-                "weight", weight
-        ));
-        this.fee = fee;
-        this.weight = weight;
+        assignFee(fee);
+        assignWeight(weight);
     }
 
     public void assignFee(int fee){
+        if (fee < 0) {
+            throw new InvalidProductParameterException("배송 비용은 0원 이하일 수 없습니다.");
+        }
         this.fee = fee;
     }
 
     public void assignWeight(int weight){
-        this.weight = weight;
-    }
-
-    /**
-     * 엔티티 음수 체크
-     * @param columns
-     */
-    private void validateNegative(Map<String, Integer> columns) {
-        for (Map.Entry<String, Integer> entry : columns.entrySet()) {
-            if (entry.getValue() < 0) {
-                throw new InvalidProductColumnException(entry.getKey());
-            }
+        if (weight <= 0) {
+            throw new InvalidProductParameterException("무게는 0보다 커야합니다.");
         }
+        this.weight = weight;
     }
 }
