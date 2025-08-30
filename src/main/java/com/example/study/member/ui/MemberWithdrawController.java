@@ -1,6 +1,7 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
+import com.example.study.common.authentication.Authentication;
 import com.example.study.common.authentication.AuthenticationContext;
 import com.example.study.member.command.application.MemberWithdrawService;
 import jakarta.servlet.http.HttpSession;
@@ -17,12 +18,11 @@ import java.util.UUID;
 public class MemberWithdrawController {
 
     private final MemberWithdrawService memberWithdrawService;
-    private final AuthenticationContext authenticationContext;
 
     @DeleteMapping
-    public ApiSuccessResponse<Void> withdraw(HttpSession session) {
+    public ApiSuccessResponse<Void> withdraw(Authentication authentication, HttpSession session) {
         // 1. 회원 탈퇴 처리
-        memberWithdrawService.withdrawMember(authenticationContext.getAuthentication().getMemberId());
+        memberWithdrawService.withdrawMember(authentication.getMemberId());
 
         // 2. 세션 무효화 (로그아웃)
         session.invalidate();
