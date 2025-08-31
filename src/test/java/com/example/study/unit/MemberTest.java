@@ -3,6 +3,7 @@ package com.example.study.unit;
 import com.example.study.member.command.domain.InvalidMemberStateException;
 import com.example.study.member.command.domain.Member;
 import com.example.study.member.command.domain.MemberStatus;
+import com.example.study.order.command.domain.AddressVO;
 import com.example.study.unit.help.MemberTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,5 +79,82 @@ public class MemberTest {
         assertThatThrownBy(member::activate)
                 .isInstanceOf(InvalidMemberStateException.class)
                 .hasMessageContaining("현재 상태(WITHDRAWN)");
+    }
+
+    @Test
+    @DisplayName("ACTIVE 상태 회원은 비밀번호 변경 가능")
+    void changePassword_success_when_status_is_active() {
+        Member member = MemberTestFactory.createActiveMember();
+        String newPassword = "newSecret123";
+
+        member.changePassword(newPassword);
+
+        assertThat(member.getPassword()).isEqualTo(newPassword);
+    }
+
+    @Test
+    @DisplayName("WITHDRAWN 상태 회원은 비밀번호 변경 시 예외 발생")
+    void changePassword_throws_when_status_is_withdrawn() {
+        Member member = MemberTestFactory.createWithdrawnMember();
+
+        assertThatThrownBy(() -> member.changePassword("newSecret123"))
+                .isInstanceOf(InvalidMemberStateException.class)
+                .hasMessageContaining("현재 상태(WITHDRAWN)");
+    }
+
+    @Test
+    @DisplayName("SUSPENDED 상태 회원은 비밀번호 변경 시 예외 발생")
+    void changePassword_throws_when_status_is_suspended() {
+        Member member = MemberTestFactory.createSuspendedMember();
+
+        assertThatThrownBy(() -> member.changePassword("newSecret123"))
+                .isInstanceOf(InvalidMemberStateException.class)
+                .hasMessageContaining("현재 상태(SUSPENDED)");
+    }
+
+    @Test
+    @DisplayName("ACTIVE 상태의 회원은 updateInfo 정상 수행")
+    void updateInfo_success_when_status_is_active() {
+        // given
+        Member member = MemberTestFactory.createActiveMember();
+        AddressVO newAddress = new AddressVO("newStreet", "newCity", "00000");
+
+        // when
+        member.updateInfo("newName", "newEmail@test.com", new AddressVO("newStreet", "newCity", "00000"));
+
+        // then
+        assertThat(member.getName()).isEqualTo("newName");
+        assertThat(member.getEmail()).isEqualTo("newEmail@test.com");
+        assertThat(member.getMemberAddress()).isEqualTo(newAddress);
+    }
+
+    @Test
+    @DisplayName("WITHDRAWN 상태 회원은 updateInfo 시 예외 발생")
+    void updateInfo_throws_when_status_is_withdrawn() {
+        // given
+        Member member = MemberTestFactory.createWithdrawnMember();
+        AddressVO newAddress = new AddressVO("newStreet", "newCity", "00000");
+
+        // expect
+        assertThatThrownBy(() ->
+                member.updateInfo("newName", "newEmail@test.com", newAddress)
+        )
+                .isInstanceOf(InvalidMemberStateException.class)
+                .hasMessageContaining("현재 상태(WITHDRAWN)");
+    }
+
+    @Test
+    @DisplayName("SUSPENDED 상태 회원은 updateInfo 시 예외 발생")
+    void updateInfo_throws_when_status_is_suspended() {
+        // given
+        Member member = MemberTestFactory.createSuspendedMember();
+        AddressVO newAddress = new AddressVO("newStreet", "newCity", "00000");
+
+        // expect
+        assertThatThrownBy(() ->
+                member.updateInfo("newName", "newEmail@test.com", newAddress)
+        )
+                .isInstanceOf(InvalidMemberStateException.class)
+                .hasMessageContaining("현재 상태(SUSPENDED)");
     }
 }

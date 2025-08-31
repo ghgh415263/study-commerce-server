@@ -1,5 +1,9 @@
 package com.example.study.common.persistance;
 
+import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.AuthenticationConstant;
+import com.example.study.common.authentication.BackOfficeAuthentication;
+import com.example.study.common.authentication.BackoffIceAuthenticationConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +46,7 @@ public class PersistenceAuditorConfig {
      */
     static class AuditorAwareImpl implements AuditorAware<String>, DateTimeProvider {
 
+        private final static String NO_SESSION = "no_session";
         /**
          * 현재 감사자(userId)를 Optional로 반환합니다.
          * 세션 또는 userId가 없으면 "no_session"을 반환합니다.
@@ -53,10 +58,17 @@ public class PersistenceAuditorConfig {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
             HttpSession session = request.getSession(false); // 세션 없으면 null 반환
             if (session == null) {
-                return Optional.of("no_session");
+                return Optional.of(NO_SESSION);
             }
-            String userId = (String) session.getAttribute("loginId");
-            return Optional.of(userId != null ? userId : "no_session");
+            var auth = (Authentication) session.getAttribute(AuthenticationConstant.AUTHENTICATION);
+            if (auth != null) {
+                return Optional.of(auth.getMemberId().toString());
+            }
+            var backofficeAuth = (BackOfficeAuthentication) session.getAttribute(BackoffIceAuthenticationConstant.BACKOFFICE_AUTHENTICATION);
+            if (backofficeAuth != null) {
+                return Optional.of(backofficeAuth.getBackofficeMemberId().toString());
+            }
+            return Optional.of(NO_SESSION);
         }
 
         /**

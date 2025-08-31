@@ -39,6 +39,9 @@ public class Member extends BaseUpdateEntity {
     @Column(nullable = false)
     private MemberStatus status = MemberStatus.ACTIVE;
 
+    @Version
+    private Integer version;
+
     public Member(String loginId, String password, String email, String name, AddressVO memberAddress) {
         this.loginId = loginId;
         this.password = password;
@@ -67,5 +70,21 @@ public class Member extends BaseUpdateEntity {
             throw new InvalidMemberStateException(this.status, MemberStatus.ACTIVE);
         }
         this.status = MemberStatus.ACTIVE;
+    }
+
+    public void changePassword(String newPassword) {
+        if (this.status != MemberStatus.ACTIVE) {
+            throw new InvalidMemberStateException(this.status, MemberStatus.ACTIVE);
+        }
+        this.password = newPassword;
+    }
+
+    public void updateInfo(String name, String email, AddressVO address) {
+        if (this.status == MemberStatus.WITHDRAWN || this.status == MemberStatus.SUSPENDED) {
+            throw new InvalidMemberStateException(this.status, MemberStatus.ACTIVE);
+        }
+        this.name = name;
+        this.email = email;
+        this.memberAddress = address;
     }
 }
