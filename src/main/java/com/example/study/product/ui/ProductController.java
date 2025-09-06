@@ -1,9 +1,9 @@
 package com.example.study.product.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.product.command.application.ProductRequestDto;
-import com.example.study.product.command.application.ProductResponseDto;
-import com.example.study.product.command.application.ProductService;
+import com.example.study.product.command.application.product.ProductRequestDto;
+import com.example.study.product.command.application.product.ProductResponseDto;
+import com.example.study.product.command.application.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

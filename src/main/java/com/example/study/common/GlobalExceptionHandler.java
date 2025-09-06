@@ -7,6 +7,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+
+import java.util.stream.Collectors;
 
 /**
  * 애플리케이션 전역에서 발생하는 예외를 처리하는 글로벌 예외 처리기 클래스입니다.
@@ -19,7 +22,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * <p>주요 처리 예외:
  * <ul>
  *   <li>{@link CustomException} - 사용자 정의 예외로, 내부에 HTTP 상태 코드와 메시지를 포함하여 응답</li>
- *   <li>{@link MethodArgumentNotValidException} - 스프링 유효성 검사 실패 시 발생하는 예외를 처리하여 상세한 필드 에러 메시지 반환</li>
+ *   <li>{@link MethodArgumentNotValidException} - @RequestBody 스프링 유효성 검사 실패 시 발생하는 예외를 처리하여 상세한 필드 에러 메시지 반환</li>
+ *   <li>{@link HandlerMethodValidationException} - @RequestParam 스프링 유효성 검사 실패 시 발생하는 예외를 처리하여 상세한 필드 에러 메시지 반환</li>
  *   <li>{@link Exception} - 그 외 모든 예외에 대해 500 내부 서버 오류로 응답하며, 내부 로그를 기록</li>
  * </ul>
  *
@@ -36,7 +40,7 @@ public class GlobalExceptionHandler {
      * 커스텀 예외는 내부에 HttpStatus와 메시지를 포함하고 있으므로,
      * 이를 이용해 적절한 상태 코드와 메시지를 응답한다.
      */
-    @ExceptionHandler(CustomException.class)
+    @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleCustomException(CustomException ex) {
         ApiErrorResponse error = new ApiErrorResponse(
                 ex.getMessage(),
@@ -50,7 +54,7 @@ public class GlobalExceptionHandler {
      * 유효성 검사 실패 처리
      * 필드별 에러 메시지를 모두 합쳐서 반환한다.
      */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
 
@@ -69,10 +73,39 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 유효성 검사 실패 처리
+     * 필드별 에러 메시지를 모두 합쳐서 반환한다.
+     */
+    @ExceptionHandler
+    public ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException exception) {
+
+        // 각 파라미터별 검증 결과
+        String errorMessages = exception.getParameterValidationResults().stream()
+                .flatMap(paramResult ->
+                        paramResult.getResolvableErrors().stream()
+                                .map(resolvable -> {
+                                    // 파라미터 이름 + 메시지 조합
+                                    String paramName = paramResult.getMethodParameter().getParameterName();
+                                    String message = resolvable.getDefaultMessage();
+                                    return paramName + ": " + message;
+                                })
+                )
+                .collect(Collectors.joining(", "));
+
+        ApiErrorResponse error = new ApiErrorResponse(
+                errorMessages,
+                "VALIDATION_ERROR",
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * 그 외 모든 예외 처리
      * 내부 에러 메시지는 노출하지 않고, 서버 오류 메시지를 대신 응답한다.
      */
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleException(Exception ex) {
         // 내부 로그 남기기
         log.error("Unexpected error occurred", ex);

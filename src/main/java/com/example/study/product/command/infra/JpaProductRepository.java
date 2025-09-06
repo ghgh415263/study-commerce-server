@@ -1,13 +1,12 @@
 package com.example.study.product.command.infra;
 
-import com.example.study.product.command.domain.CouponProduct;
-import com.example.study.product.command.domain.DeliveryProduct;
-import com.example.study.product.command.domain.Product;
-import com.example.study.product.command.domain.ProductRepository;
+import com.example.study.product.command.domain.product.CouponProduct;
+import com.example.study.product.command.domain.product.DeliveryProduct;
+import com.example.study.product.command.domain.product.Product;
+import com.example.study.product.command.domain.product.ProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
