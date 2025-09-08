@@ -1,6 +1,6 @@
 package com.example.study.common.Utils;
 
-public class StringUtils {
+public class MaskingUtils {
     /**
      * 아이디 마스킹, 앞 2글자, 뒤 2글자 뺴고는 * 처리
      * (3글자 이하는 글자수대로 마스킹)
