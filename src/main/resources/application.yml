@@ -29,3 +29,12 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE         # Hibernate SQL 파라미터 바인딩 출력
     org.springframework.jdbc.core: DEBUG       # Spring JDBC Template 쿼리 실행 로그
     org.springframework.jdbc.core.StatementCreatorUtils: TRACE  # PreparedStatement 파라미터 바인딩 상세 로그
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: study-commerce-server
