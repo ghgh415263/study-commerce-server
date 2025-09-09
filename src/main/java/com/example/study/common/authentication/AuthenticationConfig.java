@@ -23,7 +23,9 @@ public class AuthenticationConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/members/**", "/orders/**");
+                .addPathPatterns("/members/**",
+                        "/orders/**",
+                        "/reviews/**");
 
         registry.addInterceptor(new BackofficeLoginInterceptor())
                 .addPathPatterns("/backoffice/**")

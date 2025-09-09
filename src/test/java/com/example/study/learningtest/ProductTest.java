@@ -1,8 +1,8 @@
 package com.example.study.learningtest;
 
 import com.example.study.integration.TestPersistenceAuditorConfig;
-import com.example.study.product.command.application.ProductNotFoundException;
-import com.example.study.product.command.domain.*;
+import com.example.study.product.command.application.product.ProductNotFoundException;
+import com.example.study.product.command.domain.product.*;
 import com.example.study.product.command.infra.JpaProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PessimisticLockException;

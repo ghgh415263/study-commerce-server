@@ -1,6 +1,6 @@
-package com.example.study.product.command.domain;
+package com.example.study.product.command.domain.product;
 
-import com.example.study.product.command.application.InvalidProductParameterException;
+import com.example.study.product.command.application.product.InvalidProductParameterException;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;

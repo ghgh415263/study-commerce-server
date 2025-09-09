@@ -1,9 +1,9 @@
-package com.example.study.product.command.application;
+package com.example.study.common.Utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class ProductUtils {
+public class DateUtils {
     /**
      * 날짜 포매터, yyyy-MM-dd HH:mm:ss
      * @param localDateTime
@@ -12,4 +12,5 @@ public class ProductUtils {
     public static String dateFormat(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
+
 }

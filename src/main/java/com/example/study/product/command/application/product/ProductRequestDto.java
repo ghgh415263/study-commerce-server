@@ -1,4 +1,4 @@
-package com.example.study.product.command.application;
+package com.example.study.product.command.application.product;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

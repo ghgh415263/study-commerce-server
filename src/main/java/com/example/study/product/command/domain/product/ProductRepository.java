@@ -1,7 +1,4 @@
-package com.example.study.product.command.domain;
-
-import jakarta.persistence.LockModeType;
-import org.springframework.data.jpa.repository.Lock;
+package com.example.study.product.command.domain.product;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package com.example.study.product.command.domain;
+package com.example.study.product.command.domain.product;
 
 /**
  * 상품의 종류를 나타내는 열거형입니다.

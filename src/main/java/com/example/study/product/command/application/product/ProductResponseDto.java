@@ -1,9 +1,10 @@
-package com.example.study.product.command.application;
+package com.example.study.product.command.application.product;
 
-import com.example.study.product.command.domain.CouponProduct;
-import com.example.study.product.command.domain.DeliveryProduct;
-import com.example.study.product.command.domain.Product;
-import com.example.study.product.command.domain.ProductTag;
+import com.example.study.common.Utils.DateUtils;
+import com.example.study.product.command.domain.product.CouponProduct;
+import com.example.study.product.command.domain.product.DeliveryProduct;
+import com.example.study.product.command.domain.product.Product;
+import com.example.study.product.command.domain.product.ProductTag;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -44,9 +45,9 @@ public class ProductResponseDto {
             this.productTags.add(productTag.getTagName());
         }
         /* 공통 date */
-        this.createdAt = ProductUtils.dateFormat(deliveryProduct.getCreatedAt());
+        this.createdAt = DateUtils.dateFormat(deliveryProduct.getCreatedAt());
         this.createdBy = deliveryProduct.getCreatedBy();
-        this.modifiedAt = ProductUtils.dateFormat(deliveryProduct.getModifiedAt());
+        this.modifiedAt = DateUtils.dateFormat(deliveryProduct.getModifiedAt());
         this.modifiedBy = deliveryProduct.getModifiedBy();
         /* 배송형 상품 */
         this.fee = deliveryProduct.getFee();
@@ -66,9 +67,9 @@ public class ProductResponseDto {
             this.productTags.add(productTag.getTagName());
         }
         /* 공통 date */
-        this.createdAt = ProductUtils.dateFormat(couponProduct.getCreatedAt());
+        this.createdAt = DateUtils.dateFormat(couponProduct.getCreatedAt());
         this.createdBy = couponProduct.getCreatedBy();
-        this.modifiedAt = ProductUtils.dateFormat(couponProduct.getModifiedAt());
+        this.modifiedAt = DateUtils.dateFormat(couponProduct.getModifiedAt());
         this.modifiedBy = couponProduct.getModifiedBy();
         /* 쿠폰형 상품 */
         this.discountPrice = couponProduct.getDiscountPrice();

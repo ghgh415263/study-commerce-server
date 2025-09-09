@@ -1,6 +1,6 @@
-package com.example.study.product.command.domain;
+package com.example.study.product.command.domain.product;
 
-import com.example.study.product.command.application.InvalidProductParameterException;
+import com.example.study.product.command.application.product.InvalidProductParameterException;
 
 /**
  * 상품의 상태를 나타내는 열거형입니다.

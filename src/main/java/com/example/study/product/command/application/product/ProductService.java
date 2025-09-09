@@ -1,6 +1,6 @@
-package com.example.study.product.command.application;
+package com.example.study.product.command.application.product;
 
-import com.example.study.product.command.domain.*;
+import com.example.study.product.command.domain.product.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

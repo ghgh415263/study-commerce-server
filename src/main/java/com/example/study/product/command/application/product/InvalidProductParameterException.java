@@ -1,4 +1,4 @@
-package com.example.study.product.command.application;
+package com.example.study.product.command.application.product;
 
 import com.example.study.common.CustomException;
 import org.springframework.http.HttpStatus;
