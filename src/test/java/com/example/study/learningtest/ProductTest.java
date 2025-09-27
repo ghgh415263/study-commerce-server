@@ -169,7 +169,7 @@ public class ProductTest {
 
         // then
         assertThatThrownBy(() ->
-                productRepository.findByProductId(saved.getId())
+                productRepository.findById(saved.getId())
                         .orElseThrow(ProductNotFoundException::new)
         )
                 .isInstanceOf(ProductNotFoundException.class)

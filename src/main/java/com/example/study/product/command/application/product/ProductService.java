@@ -20,7 +20,7 @@ public class ProductService {
      */
     @Transactional
     public ProductResponseDto getProduct(Long productId){
-        Product product = productRepository.findByProductId(productId).orElseThrow(ProductNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
 
         if(product instanceof DeliveryProduct){
             return ProductResponseDto.deliveryProduct(product, ProductType.DELIVERY.name());
@@ -131,7 +131,7 @@ public class ProductService {
      */
     @Transactional
     public void deleteProduct(Long productId){
-        Product product = productRepository.findByProductId(productId).orElseThrow(ProductNotFoundException::new);
+        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
         productRepository.delete(product);
     }
 }
