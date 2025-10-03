@@ -3,6 +3,11 @@ spring:
     compose:
       skip:
         in-tests: false
+  sql:
+    init:
+      mode: always       # schema.sql 실행
+      encoding: UTF-8
+
   datasource:
     url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: testuser
@@ -38,3 +43,4 @@ management:
   metrics:
     tags:
       application: study-commerce-server
+

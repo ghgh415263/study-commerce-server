@@ -10,7 +10,6 @@ public interface LockManager {
      *
      * @param lockName 락 이름
      * @param timeoutSeconds 타임아웃(초)
-     * @return 락 획득 성공 여부
      */
     boolean acquireLock(String lockName, int timeoutSeconds);
 
