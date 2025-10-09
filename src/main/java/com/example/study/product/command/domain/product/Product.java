@@ -44,9 +44,6 @@ public abstract class Product extends BaseUpdateEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<ProductTag> productTags = new ArrayList<>();
 
-    @Column(name = "product_type", insertable = false, updatable = false)
-    private String productType;
-
     public Product(String name, int price, int stockQuantity, String description, String productStatus) {
         this.name = name;
         assignPrice(price);

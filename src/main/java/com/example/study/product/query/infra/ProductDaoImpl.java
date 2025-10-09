@@ -1,19 +1,19 @@
 package com.example.study.product.query.infra;
 
 import com.example.study.common.CustomPage;
-import com.example.study.product.command.domain.product.Product;
-import com.example.study.product.command.domain.product.ProductType;
+import com.example.study.product.command.domain.product.ProductStatus;
+import com.example.study.product.query.dao.BOProductQueryDto;
+import com.example.study.product.query.dao.FOProductQueryDto;
 import com.example.study.product.query.dao.ProductDao;
-import com.example.study.product.query.dao.ProductQueryDto;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,78 +21,124 @@ public class ProductDaoImpl implements ProductDao {
 
     private final EntityManager em;
 
+    /**
+     * FO 상품 조회
+     */
     @Override
     @Transactional(readOnly = true)
-    public CustomPage<ProductQueryDto> findByProductIdWithPaging(String type, int page, int size) {
+    public CustomPage<FOProductQueryDto> findByFOProductIdWithPaging(int page, int size) {
         int offset = (page - 1) * size;
 
-        // 1. 상품 타입 조회
-        ProductType requestProductType = ProductType.from(type);
-        String productType = requestProductType != null ? requestProductType.name() : null;
-
-        // 2. 상품 아이디 조회 + 태그 조회
-        List<Long> productIds = em.createQuery(
-                    "SELECT p.id " +
-                            "FROM Product p " +
-                            "WHERE (:productType IS NULL OR p.productType = :productType) " +
-                            "ORDER BY p.createdAt DESC",
-                    Long.class
-                )
-                .setParameter("productType", productType)
+        // 상품 조회 (DTO 직접 매핑)
+        List<FOProductQueryDto> fOProductQueryDtos = em.createQuery(
+                        "SELECT new com.example.study.product.query.dao.FOProductQueryDto(" +
+                                "p.id, p.name, p.price, p.stockQuantity, " +
+                                "p.description, p.productStatus, TYPE(p)) " +
+                                "FROM Product p " +
+                                "ORDER BY p.createdAt DESC",
+                        FOProductQueryDto.class)
                 .setFirstResult(offset)
                 .setMaxResults(size)
                 .getResultList();
 
-        List<Object[]> content = em.createQuery(
-                        "SELECT p, pt.tagName " +
-                                "FROM Product p " +
-                                "LEFT JOIN p.productTags pt " +
-                                "WHERE p.id IN :ids " +
-                                "ORDER BY p.createdAt DESC",
-                        Object[].class
-                )
+        // 상품 id 추출, 태그 리스트 조회
+        List<Long> productIds = fOProductQueryDtos.stream()
+                .map(FOProductQueryDto::getId)
+                .toList();
+
+        @SuppressWarnings("unchecked")
+        List<Tuple> tagList = em.createNativeQuery(
+                        "SELECT pt.product_id AS productId, " +
+                                "pt.tag_name AS tagName " +
+                                "FROM product_tag pt " +
+                                "WHERE pt.product_id IN :ids",
+                        Tuple.class)
                 .setParameter("ids", productIds)
                 .getResultList();
 
-        // 3. 조회 결과 그룹핑
-        List<ProductQueryDto> productQueryDtoList = getProductQueryDtos(content);
+        // 상품 queryDtos + 태그 조립
+        Map<Long, FOProductQueryDto> dtoMap = fOProductQueryDtos.stream()
+                .collect(Collectors.toMap(FOProductQueryDto::getId, dto -> dto));
 
-        // 4. 전체 개수 조회
-        Long totalElements = em.createQuery(
-                        "SELECT COUNT(p) " +
-                                "FROM Product p " +
-                                "WHERE (:productType IS NULL OR p.productType = :productType) ",
-                        Long.class
-                )
-                .setParameter("productType", productType)
-                .getSingleResult();
+        tagList.forEach(t -> {
+            Long productId = ((Number) t.get("productId")).longValue();
+            String tagName = t.get("tagName", String.class);
 
-        return new CustomPage<>(productQueryDtoList, page, size, totalElements);
-    }
-
-    private List<ProductQueryDto> getProductQueryDtos(List<Object[]> content) {
-        Map<Long, ProductQueryDto> resultMap = new LinkedHashMap<>();
-
-        for (Object[] row : content) {
-            Product p = (Product) row[0];
-            String tagName = (String) row[1];
-
-            ProductQueryDto dto = resultMap.computeIfAbsent(
-                    p.getId(),
-                    id -> new ProductQueryDto(
-                            p.getId(),
-                            p.getName(),
-                            p.getPrice(),
-                            p.getStockQuantity(),
-                            p.getDescription(),
-                            p.getProductStatus()
-                    )
-            );
-
-            if (tagName != null) {
+            FOProductQueryDto dto = dtoMap.get(productId);
+            if (dto != null && tagName != null) {
                 dto.addTag(tagName);
             }
-        }
-        return new ArrayList<>(resultMap.values());
+        });
+
+        // 전체 개수 조회
+        Long totalElements = em.createQuery(
+                        "SELECT COUNT(p) " +
+                                "FROM Product p ",
+                        Long.class
+                )
+                .getSingleResult();
+
+        return new CustomPage<>(fOProductQueryDtos, page, size, totalElements);
+    }
+
+
+    /**
+     * BO 상품 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public CustomPage<BOProductQueryDto> findByBOProductIdWithPaging(int page, int size) {
+        int offset = (page - 1) * size;
+
+        // 상품 조회
+        List<BOProductQueryDto> bOProductQueryDtos = em.createQuery(
+                        "SELECT new com.example.study.product.query.dao.BOProductQueryDto(" +
+                                "p.id, p.name, p.price, p.stockQuantity, " +
+                                "p.description, p.productStatus, TYPE(p)) " +
+                                "FROM Product p " +
+                                "ORDER BY p.createdAt DESC",
+                        BOProductQueryDto.class)
+                .setFirstResult(offset)
+                .setMaxResults(size)
+                .getResultList();
+
+        // 상품 id 추출, 태그 리스트 조회
+        List<Long> productIds = bOProductQueryDtos.stream()
+                .map(BOProductQueryDto::getId)
+                .toList();
+
+        @SuppressWarnings("unchecked")
+        List<Tuple> tagList = em.createNativeQuery(
+                        "SELECT pt.product_id AS productId, " +
+                                "pt.tag_name AS tagName " +
+                                "FROM product_tag pt " +
+                                "WHERE pt.product_id IN :ids",
+                        Tuple.class)
+                .setParameter("ids", productIds)
+                .getResultList();
+
+        // 상품 queryDtos + 태그 조립
+        Map<Long, BOProductQueryDto> dtoMap = bOProductQueryDtos.stream()
+                .collect(Collectors.toMap(BOProductQueryDto::getId, dto -> dto));
+
+        tagList.forEach(t -> {
+            Long productId = ((Number) t.get("productId")).longValue();
+            String tagName = t.get("tagName", String.class);
+
+            BOProductQueryDto dto = dtoMap.get(productId);
+            if (dto != null && tagName != null) {
+                dto.addTag(tagName);
+            }
+        });
+
+        // 전체 개수 조회
+        Long totalElements = em.createQuery(
+                        "SELECT COUNT(p) " +
+                                "FROM Product p ",
+                        Long.class
+                )
+                .getSingleResult();
+
+        return new CustomPage<>(bOProductQueryDtos, page, size, totalElements);
     }
 }

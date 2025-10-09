@@ -7,22 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ProductQueryDto {
+public class BOProductQueryDto {
     private Long id;
     private String name;
     private int price;
     private int stockQuantity;
     private String description;
     private String productStatus;
+    private String productType;
     private List<String> productTags = new ArrayList<>();
 
-    public ProductQueryDto(Long id, String name, int price, int stockQuantity, String description, ProductStatus productStatus) {
+    public BOProductQueryDto(Long id, String name, int price, int stockQuantity, String description, ProductStatus productStatus, Class<?> productType) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.description = description;
         this.productStatus = productStatus.name();
+        this.productType = productType.getSimpleName();
     }
 
     public void addTag(String tagName) {
