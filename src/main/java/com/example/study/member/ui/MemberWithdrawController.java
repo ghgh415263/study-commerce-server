@@ -2,7 +2,6 @@ package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
 import com.example.study.common.authentication.Authentication;
-import com.example.study.common.authentication.AuthenticationContext;
 import com.example.study.member.command.application.MemberWithdrawService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

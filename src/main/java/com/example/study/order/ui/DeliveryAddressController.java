@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/orders/delivery-addresses")
@@ -24,9 +26,10 @@ public class DeliveryAddressController {
 	@PostMapping
 	public ApiSuccessResponse<Void> save(@Valid @RequestBody DeliveryAddressDto dto) {
 
-		String lockName = "deliveryAddress-lock:" + authenticationContext.getAuthentication().getMemberId();
+        UUID memberId = authenticationContext.getAuthentication().getMemberId();
+		String lockName = "deliveryAddress-lock:" + memberId;
 
-		lockTemplate.executeWithLock(lockName, () -> deliveryAddressService.saveDeliveryAddress(dto));
+		lockTemplate.executeWithLock(lockName, () -> deliveryAddressService.saveDeliveryAddress(memberId, dto));
 
 		return ApiSuccessResponse.empty();
 	}
