@@ -33,7 +33,7 @@ public class ProductDaoImpl implements ProductDao {
         List<FOProductQueryDto> fOProductQueryDtos = em.createQuery(
                         "SELECT new com.example.study.product.query.dao.FOProductQueryDto(" +
                                 "p.id, p.name, p.price, p.stockQuantity, " +
-                                "p.description, p.productStatus, TYPE(p)) " +
+                                "p.description, p.productStatus, p.productType) " +
                                 "FROM Product p " +
                                 "ORDER BY p.createdAt DESC",
                         FOProductQueryDto.class)
@@ -94,7 +94,7 @@ public class ProductDaoImpl implements ProductDao {
         List<BOProductQueryDto> bOProductQueryDtos = em.createQuery(
                         "SELECT new com.example.study.product.query.dao.BOProductQueryDto(" +
                                 "p.id, p.name, p.price, p.stockQuantity, " +
-                                "p.description, p.productStatus, TYPE(p)) " +
+                                "p.description, p.productStatus, p.productType) " +
                                 "FROM Product p " +
                                 "ORDER BY p.createdAt DESC",
                         BOProductQueryDto.class)
