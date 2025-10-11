@@ -1,6 +1,7 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
+import com.example.study.common.authentication.Authentication;
 import com.example.study.member.command.application.MemberUpdateDto;
 import com.example.study.member.command.application.MemberUpdateService;
 import jakarta.validation.Valid;
@@ -19,9 +20,10 @@ public class MemberUpdateController {
 
     @PatchMapping("/detail")
     public ApiSuccessResponse<Void> updateMember(
-            @Valid @RequestBody MemberUpdateDto dto
+            @Valid @RequestBody MemberUpdateDto dto,
+            Authentication authentication
     ) {
-        memberUpdateService.updateMember(dto);
+        memberUpdateService.updateMember(authentication.getMemberId(), dto);
         return ApiSuccessResponse.empty();
     }
 }

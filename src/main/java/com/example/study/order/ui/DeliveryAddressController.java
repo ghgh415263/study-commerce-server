@@ -1,6 +1,6 @@
 package com.example.study.order.ui;
 
-import com.example.study.common.authentication.AuthenticationContext;
+import com.example.study.common.authentication.Authentication;
 import com.example.study.common.lock.LockTemplate;
 import com.example.study.order.command.application.DeliveryAddressDto;
 import com.example.study.order.command.application.DeliveryAddressRequestDto;
@@ -19,14 +19,12 @@ public class DeliveryAddressController {
 
 	private final LockTemplate lockTemplate;
 
-	private final AuthenticationContext authenticationContext;
-
 	@PostMapping
-	public ApiSuccessResponse<Void> save(@Valid @RequestBody DeliveryAddressDto dto) {
+	public ApiSuccessResponse<Void> save(@Valid @RequestBody DeliveryAddressDto dto, Authentication authentication) {
 
-		String lockName = "deliveryAddress-lock:" + authenticationContext.getAuthentication().getMemberId();
+		String lockName = "deliveryAddress-lock:" + authentication.getMemberId();
 
-		lockTemplate.executeWithLock(lockName, () -> deliveryAddressService.saveDeliveryAddress(dto));
+		lockTemplate.executeWithLock(lockName, () -> deliveryAddressService.saveDeliveryAddress(authentication.getMemberId(), dto));
 
 		return ApiSuccessResponse.empty();
 	}

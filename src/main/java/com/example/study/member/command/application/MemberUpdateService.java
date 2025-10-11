@@ -1,6 +1,5 @@
 package com.example.study.member.command.application;
 
-import com.example.study.common.authentication.AuthenticationContext;
 import com.example.study.member.command.domain.Member;
 import com.example.study.member.command.domain.MemberRepository;
 import com.example.study.member.command.domain.PasswordEncoder;
@@ -9,19 +8,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class MemberUpdateService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationContext authenticationContext;
 
     @Transactional
-    public void updateMember(MemberUpdateDto dto) {
+    public void updateMember(UUID memberId, MemberUpdateDto dto) {
 
         // 회원 조회
-        Member member = memberRepository.findById(authenticationContext.getAuthentication().getMemberId())
+        Member member = memberRepository.findById(memberId)
                 .filter(m -> passwordEncoder.isMatch(dto.password(), m.getPassword()))
                 .orElseThrow(InvalidCredentialsException::new);
 
