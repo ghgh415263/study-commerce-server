@@ -15,7 +15,7 @@ public class LockTemplate {
 
     public LockTemplate(LockManager lockManager) {
         this.lockManager = lockManager;
-        this.timeoutSeconds = 3;
+        this.timeoutSeconds = 2;
     }
 
     /**

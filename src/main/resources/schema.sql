@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS app_lock (
+    lock_name VARCHAR(100) PRIMARY KEY,
+    expire_at DATETIME NOT NULL
+);
