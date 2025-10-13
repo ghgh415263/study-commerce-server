@@ -17,7 +17,7 @@ import java.util.UUID;
 public class Member extends BaseUpdateEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, unique = true)

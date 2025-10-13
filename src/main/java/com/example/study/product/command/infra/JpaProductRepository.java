@@ -9,6 +9,7 @@ import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class JpaProductRepository implements ProductRepository{
     }
 
     @Override
-    public Optional<Product> findByProductId(Long id) {
+    public Optional<Product> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Product.class, id, LockModeType.PESSIMISTIC_WRITE));
     }
 
@@ -47,4 +48,16 @@ public class JpaProductRepository implements ProductRepository{
         entityManager.remove(product);
     }
 
+    @Override
+    public List<Product> findAllByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+
+        return entityManager.createQuery(
+                        "SELECT p FROM Product p WHERE p.id IN :ids", Product.class)
+                .setParameter("ids", ids)
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 락
+                .getResultList();
+    }
 }

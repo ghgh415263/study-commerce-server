@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /**
  * 회원 가입 서비스를 담당하는 클래스입니다.
  */
@@ -21,6 +23,8 @@ public class MemberJoinService {
 
     private final MemberCheckService memberCheckService;
 
+    private final OrderWalletClient orderWalletClient;
+
     /**
      * 회원 가입 처리 메서드
      * 1. 비밀번호 강도 확인 (약한 경우 예외 발생)
@@ -31,7 +35,7 @@ public class MemberJoinService {
      * @return 저장된 회원의 ID
      */
     @Transactional
-    public String saveMember(MemberJoinDto memberJoinDto) {
+    public UUID saveMember(MemberJoinDto memberJoinDto) {
 
         if (passwordMeter.isWeak(memberJoinDto.password()))
             throw new WeakPasswordException();
@@ -52,6 +56,10 @@ public class MemberJoinService {
                 memberJoinDto.name(),
                 address);
 
-        return memberRepository.save(member).getId().toString();
+        memberRepository.save(member);
+
+        orderWalletClient.createWallet(member.getId());
+
+        return member.getId();
     }
 }

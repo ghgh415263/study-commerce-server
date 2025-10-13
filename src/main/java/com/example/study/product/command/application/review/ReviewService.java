@@ -26,7 +26,7 @@ public class ReviewService {
      */
     @Transactional
     public Long saveReview(UUID memberId , ReviewRequestDto dto){
-        productRepository.findByProductId(dto.productId())
+        productRepository.findById(dto.productId())
                 .orElseThrow(ProductNotFoundException::new);
         Review review = new Review(memberId, dto.productId(), dto.content(), dto.star());
         return reviewRepository.save(review).getId();
