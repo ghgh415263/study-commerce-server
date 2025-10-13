@@ -17,14 +17,14 @@ public class FOProductQueryDto {
     private String productType;
     private List<String> productTags = new ArrayList<>();
 
-    public FOProductQueryDto(Long id, String name, int price, int stockQuantity, String description, ProductStatus productStatus, Class<?> productType) {
+    public FOProductQueryDto(Long id, String name, int price, int stockQuantity, String description, ProductStatus productStatus, String productType) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.description = description;
         this.productStatus = productStatus.name();
-        this.productType = productType.getSimpleName();
+        this.productType = productType;
     }
 
     public void addTag(String tagName) {
