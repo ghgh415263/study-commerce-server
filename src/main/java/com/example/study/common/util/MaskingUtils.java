@@ -1,4 +1,4 @@
-package com.example.study.common.Utils;
+package com.example.study.common.util;
 
 public class MaskingUtils {
     /**

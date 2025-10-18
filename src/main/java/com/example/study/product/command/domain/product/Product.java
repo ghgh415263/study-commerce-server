@@ -44,7 +44,8 @@ public abstract class Product extends BaseUpdateEntity {
 
     // 읽기 전용
     @Column(name = "product_type", insertable = false, updatable = false)
-    private String productType;
+    @Enumerated(EnumType.STRING)
+    private ProductType productType;
 
     public Product(String name, int price, int stockQuantity, String description, String productStatus) {
         this.name = name;

@@ -1,6 +1,6 @@
 package com.example.study.product.command.application.product;
 
-import com.example.study.common.Utils.DateUtils;
+import com.example.study.common.util.DateUtils;
 import com.example.study.product.command.domain.product.CouponProduct;
 import com.example.study.product.command.domain.product.DeliveryProduct;
 import com.example.study.product.command.domain.product.Product;

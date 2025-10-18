@@ -48,7 +48,7 @@ public class OrderItem extends BaseUpdateEntity {
         return new OrderItem(productId, quantity, priceAtOrder);
     }
 
-    public void setOrder(Order order) {
+    void setOrder(Order order) {
         this.order = order;
     }
 

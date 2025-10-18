@@ -1,6 +1,7 @@
 package com.example.study.product.query.dao;
 
 import com.example.study.product.command.domain.product.ProductStatus;
+import com.example.study.product.command.domain.product.ProductType;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -17,14 +18,14 @@ public class BOProductQueryDto {
     private String productType;
     private List<String> productTags = new ArrayList<>();
 
-    public BOProductQueryDto(Long id, String name, int price, int stockQuantity, String description, ProductStatus productStatus, String productType) {
+    public BOProductQueryDto(Long id, String name, int price, int stockQuantity, String description, ProductStatus productStatus, ProductType productType) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.description = description;
         this.productStatus = productStatus.name();
-        this.productType = productType;
+        this.productType = productType.name();
     }
 
     public void addTag(String tagName) {

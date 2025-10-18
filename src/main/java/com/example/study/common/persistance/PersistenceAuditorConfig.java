@@ -8,21 +8,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAccessor;
 import java.util.Optional;
 
 /**
  * JPA 감사(Audit) 설정을 위한 Spring Configuration 클래스입니다.
  *
- * 현재 로그인한 사용자의 ID를 세션에서 가져와 감사자 정보로 사용하며,
- * 감사 시점의 현재 시간을 제공하는 DateTimeProvider도 함께 구현합니다.
+ * 현재 로그인한 사용자의 ID를 세션에서 가져와 감사자 정보로 사용합니다.
  *
  * 세션이 없거나 userId가 없으면 "no_session" 문자열로 처리합니다.
  */
@@ -41,10 +37,9 @@ public class PersistenceAuditorConfig {
     }
 
     /**
-     * 현재 요청의 세션에서 사용자 ID를 조회하여 감사자 정보를 제공하고,
-     * 현재 시각을 제공하는 AuditorAware 및 DateTimeProvider 구현체입니다.
+     * 현재 요청의 세션에서 사용자 ID를 조회하여 감사자 정보를 제공
      */
-    static class AuditorAwareImpl implements AuditorAware<String>, DateTimeProvider {
+    static class AuditorAwareImpl implements AuditorAware<String> {
 
         private final static String NO_SESSION = "no_session";
         /**
@@ -71,14 +66,5 @@ public class PersistenceAuditorConfig {
             return Optional.of(NO_SESSION);
         }
 
-        /**
-         * 현재 시각을 ZonedDateTime 형태로 반환합니다.
-         *
-         * @return 현재 시간의 TemporalAccessor Optional
-         */
-        @Override
-        public Optional<TemporalAccessor> getNow() {
-            return Optional.of(ZonedDateTime.now());
-        }
     }
 }

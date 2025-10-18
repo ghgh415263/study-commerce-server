@@ -11,7 +11,7 @@ public record CreateOrderDto(
         @Valid
         List<OrderItemDto> items,
 
-        @NotNull(message = "배송 정보는 필수입니다.")
-        @Valid
-        OrderDeliveryDto delivery
+        OrderDeliveryDto delivery,
+
+        String couponIssueContact
 ) {}

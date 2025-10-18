@@ -20,6 +20,7 @@ public class OrderCreateService {
     private final WalletRepository walletRepository;
     private final ProductClient productClient;
     private final PaymentRepository paymentRepository;
+    private final DeliveryRepository deliveryRepository;
 
     @Transactional
     public Long createOrder(CreateOrderDto dto, UUID memberId) {
@@ -64,6 +65,19 @@ public class OrderCreateService {
         // 결제 생성
         Payment payment = new Payment(totalPrice, LocalDateTime.now(), order.getId());
         paymentRepository.save(payment);
+
+        List<OrderItem> deliveryOrderItems = items.stream()
+                .filter(i -> "DELIVERY".equals(priceMap.get(i.getProductId()).productType()))
+                .toList();
+
+        if (!deliveryOrderItems.isEmpty()) {
+            Delivery delivery = new Delivery(DeliveryStatus.NOT_STARTED, dto.delivery().address(), dto.delivery().contact());
+            List<Long> deliveryOrderItemIds = deliveryOrderItems.stream()
+                    .map(OrderItem::getId)
+                    .toList();
+            delivery.addDeliveryItems(deliveryOrderItemIds);
+            deliveryRepository.save(delivery);
+        }
 
         return order.getId();
     }

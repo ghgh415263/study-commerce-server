@@ -53,7 +53,7 @@ public class ProductClientImpl implements ProductClient {
     @Override
     public List<OrderedProduct> getOrderedProducts(List<Long> productIds) {
         return productRepository.findAllByIds(productIds).stream()
-                .map(p -> new OrderedProduct(p.getId(), p.getPrice()))
+                .map(p -> new OrderedProduct(p.getId(), p.getPrice(), p.getProductType().name()))
                 .collect(Collectors.toList());
     }
 }

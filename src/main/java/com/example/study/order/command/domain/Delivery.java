@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Audited
 @Getter
@@ -18,7 +20,7 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 배송 상태 (예: READY, SHIPPED, DELIVERED, CANCELED)
+    // 배송 상태
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private DeliveryStatus status;
@@ -41,13 +43,37 @@ public class Delivery {
     // 배송 완료 일시
     private LocalDateTime deliveredAt;
 
-    @Column(nullable = false)
-    private Long orderId;
+    @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeliveryItem> deliveryItems = new ArrayList<>();
 
-    public Delivery(DeliveryStatus status, String address, String contact, String trackingNumber) {
+    public Delivery(DeliveryStatus status, String address, String contact) {
         this.status = status;
         this.address = address;
         this.contact = contact;
+    }
+
+    public void addDeliveryItems(List<Long> orderItemIds) {
+        for (Long orderItemId : orderItemIds) {
+            DeliveryItem item = new DeliveryItem(orderItemId);
+            item.setDelivery(this); // 양방향 연관관계 주입
+            deliveryItems.add(item);
+        }
+    }
+
+    public void ship(String trackingNumber) {
+        if (this.status != DeliveryStatus.READY) {
+            throw new IllegalStateException("배송 준비 상태에서만 출고 가능합니다.");
+        }
         this.trackingNumber = trackingNumber;
+        this.shippedAt = LocalDateTime.now();
+        this.status = DeliveryStatus.SHIPPED;
+    }
+
+    public void complete() {
+        if (this.status != DeliveryStatus.SHIPPED) {
+            throw new IllegalStateException("출고 상태에서만 배송 완료 가능합니다.");
+        }
+        this.deliveredAt = LocalDateTime.now();
+        this.status = DeliveryStatus.DELIVERED;
     }
 }
