@@ -1,5 +1,6 @@
 package com.example.study.order.command.application;
 
+import com.example.study.common.InvalidArgumentException;
 import com.example.study.order.command.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class OrderCreateService {
     private final ProductClient productClient;
     private final PaymentRepository paymentRepository;
     private final DeliveryRepository deliveryRepository;
+    private final CouponIssuanceBulkRepository couponIssuanceBulkRepository;
 
     @Transactional
     public Long createOrder(CreateOrderDto dto, UUID memberId) {
@@ -66,17 +68,30 @@ public class OrderCreateService {
         Payment payment = new Payment(totalPrice, LocalDateTime.now(), order.getId());
         paymentRepository.save(payment);
 
-        List<OrderItem> deliveryOrderItems = items.stream()
-                .filter(i -> "DELIVERY".equals(priceMap.get(i.getProductId()).productType()))
-                .toList();
+        Map<String, List<OrderItem>> groupedItems = items.stream()
+                .collect(Collectors.groupingBy(
+                        i -> priceMap.get(i.getProductId()).productType()
+                ));
 
-        if (!deliveryOrderItems.isEmpty()) {
+        List<OrderItem> deliveryItems = groupedItems.getOrDefault("DELIVERY", List.of());
+        List<OrderItem> couponItems = groupedItems.getOrDefault("COUPON", List.of());
+
+        // 배송형 상품이 존재하면 배송 생성
+        if (!deliveryItems.isEmpty()) {
             Delivery delivery = new Delivery(DeliveryStatus.NOT_STARTED, dto.delivery().address(), dto.delivery().contact());
-            List<Long> deliveryOrderItemIds = deliveryOrderItems.stream()
+            List<Long> deliveryOrderItemIds = deliveryItems.stream()
                     .map(OrderItem::getId)
                     .toList();
             delivery.addDeliveryItems(deliveryOrderItemIds);
             deliveryRepository.save(delivery);
+        }
+
+        // 쿠폰형 상품이 존재하면 쿠폰발행 생성
+        if (!couponItems.isEmpty()) {
+            List<CouponIssuance> couponIssuanceList = couponItems.stream()
+                    .map(c -> new CouponIssuance(c.getId(), dto.couponIssueContact()))
+                    .toList();
+            couponIssuanceBulkRepository.saveAll(couponIssuanceList);
         }
 
         return order.getId();

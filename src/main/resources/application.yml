@@ -30,10 +30,11 @@ mybatis:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG                   # Hibernate SQL 쿼리 출력
-    org.hibernate.orm.jdbc.bind: TRACE         # Hibernate SQL 파라미터 바인딩 출력
-    org.springframework.jdbc.core: DEBUG       # Spring JDBC Template 쿼리 실행 로그
-    org.springframework.jdbc.core.StatementCreatorUtils: TRACE  # PreparedStatement 파라미터 바인딩 상세 로그
+    org:
+      hibernate:
+        SQL: DEBUG                   # Hibernate SQL 쿼리 출력
+        orm.jdbc.bind: TRACE         # Hibernate SQL 파라미터 바인딩 출력
+      springframework.jdbc: DEBUG       # Spring JDBC Template 쿼리 실행 로그
 
 management:
   endpoints:
