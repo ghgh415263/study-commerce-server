@@ -11,6 +11,9 @@ import org.hibernate.envers.Audited;
 @Getter
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product_tag", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "tagName"})
+})
 public class ProductTag extends BaseUpdateEntity {
 
     @Id

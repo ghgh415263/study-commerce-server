@@ -13,6 +13,9 @@ import java.util.UUID;
 @Entity
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "review", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "member_id"})
+})
 public class Review extends BaseUpdateEntity {
 
     @Id
