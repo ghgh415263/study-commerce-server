@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,8 @@ public class ProductService {
      */
     @Transactional
     public Long saveDeliveryProduct(ProductRequestDto dto){
+        checkDuplicateProductTags(dto.productTags(), null);
+
         DeliveryProduct delivertProduct = new DeliveryProduct(
                 dto.name()
                 , dto.price()
@@ -47,6 +50,7 @@ public class ProductService {
                 , dto.deliveryProduct().fee()
                 , dto.deliveryProduct().weight()
         );
+
         for(ProductTagDto productTag : dto.productTags()){
             delivertProduct.assignProductTags(new ProductTag(productTag.tagName()));
         }
@@ -61,6 +65,8 @@ public class ProductService {
     @Transactional
     public void updateDeliveryProduct(Long productId, ProductRequestDto dto){
         DeliveryProduct deliveryProduct = productRepository.findByDeliveryProductId(productId).orElseThrow(ProductNotFoundException::new);
+
+        checkDuplicateProductTags(dto.productTags(), deliveryProduct.getProductTags());
 
         deliveryProduct.update(
                 dto.name()
@@ -85,6 +91,8 @@ public class ProductService {
      */
     @Transactional
     public Long saveCouponProduct(ProductRequestDto dto){
+        checkDuplicateProductTags(dto.productTags(), null);
+
         CouponProduct couponProduct = new CouponProduct(
                 dto.name()
                 , dto.price()
@@ -94,6 +102,7 @@ public class ProductService {
                 , dto.couponProduct().discountPrice()
                 , dto.couponProduct().effectiveDay()
         );
+
         for(ProductTagDto productTag : dto.productTags()){
             couponProduct.assignProductTags(new ProductTag(productTag.tagName()));
         }
@@ -108,6 +117,8 @@ public class ProductService {
     @Transactional
     public void updateCouponProduct(Long productId, ProductRequestDto dto){
         CouponProduct couponProduct = productRepository.findByCouponProductId(productId).orElseThrow(ProductNotFoundException::new);
+
+        checkDuplicateProductTags(dto.productTags(), couponProduct.getProductTags());
 
         couponProduct.update(
                 dto.name()
@@ -133,5 +144,42 @@ public class ProductService {
     public void deleteProduct(Long productId){
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
         productRepository.delete(product);
+    }
+
+    /**
+     * 상품 태그 중복 체크
+     * @param requestProductTags
+     * @param originProductTags
+     */
+    private void checkDuplicateProductTags(List<ProductTagDto> requestProductTags, List<ProductTag> originProductTags) {
+        // 요청 상품 태그 중복 체크
+        Map<String, Long> duplicateRequestTagCounts = requestProductTags.stream()
+                        .collect(Collectors.groupingBy(ProductTagDto::tagName, Collectors.counting()));
+
+        Set<String> duplicateRequestTags = duplicateRequestTagCounts.entrySet().stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        if(!duplicateRequestTags.isEmpty()){
+            throw new DuplicateProductTagsException(duplicateRequestTags);
+        }
+
+        // 기존 상품 태그 와 요청 상품 태그 간  중복 체크
+        if(originProductTags != null){
+            Set<String> originTagNames = originProductTags.stream()
+                    .map(ProductTag::getTagName)
+                    .collect(Collectors.toSet());
+
+            Set<String> duplicatedTagNamesOriginAndRequest = requestProductTags.stream()
+                    .map(ProductTagDto::tagName)
+                    .filter(originTagNames::contains)
+                    .collect(Collectors.toSet());
+
+            if(!duplicatedTagNamesOriginAndRequest.isEmpty()){
+                throw new DuplicateProductTagsException(duplicatedTagNamesOriginAndRequest);
+            }
+        }
+
     }
 }
