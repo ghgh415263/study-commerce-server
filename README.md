@@ -5,7 +5,9 @@
 - [x] **Spring 기반 백엔드 개발**  
   개발자가 반드시 정복해야할 객체지향과 디자인 패턴 도서 및 JPA 강의를 학습하며 익힌 내용 적용
 - [x] **DDD 기반 리팩토링**  
-  DDD 시작하기 도서를 참고하여 도메인 주도 설계 중 일부 적용
+  - DDD 시작하기 도서를 참고하여 도메인 주도 설계 중 일부 적용
+  - 구현의 편의성을 위해서 @Entity와 JPA 연관 관계를 통해서 어그리거트 구현
+  - 각 컨텍스트별로 모델 분리. 현재는 member, order, product 컨텍스트를 유지중
 - [ ] **모듈 분리 계획**  
   `order` 서비스 분리를 준비 중
 
@@ -48,7 +50,7 @@
 # 컨텍스트별 ERD
 현재는 회원, 주문, 상품 컨텍스트를 유지중
 
-### 회원
-### 주문
-### 상품
+### Member Context
+### Order Context
+### Product Context
 <img width="961" height="435" alt="505640443-359189eb-6044-4464-86dc-02c9c5ddd4eb" src="https://github.com/user-attachments/assets/60c8cd9f-d758-420f-ae9b-801ebfb0d492" />
