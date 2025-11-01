@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @Audited
@@ -34,5 +36,17 @@ public class ProductTag extends BaseUpdateEntity {
 
     public void assignProduct(Product product){
         this.product = product;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductTag that = (ProductTag) o;
+        return Objects.equals(tagName, that.tagName) && Objects.equals(product, that.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagName, product);
     }
 }

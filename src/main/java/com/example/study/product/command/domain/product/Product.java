@@ -1,7 +1,9 @@
 package com.example.study.product.command.domain.product;
 
 import com.example.study.common.persistance.BaseUpdateEntity;
+import com.example.study.product.command.application.product.DuplicateProductTagsException;
 import com.example.study.product.command.application.product.InvalidProductParameterException;
+import com.example.study.product.command.application.product.ProductTagDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,8 +11,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -42,7 +44,7 @@ public abstract class Product extends BaseUpdateEntity {
     private ProductStatus productStatus = ProductStatus.SOLD_OUT;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<ProductTag> productTags = new ArrayList<>();
+    private Set<ProductTag> productTags = new HashSet<>();
 
     // 읽기 전용
     @Column(name = "product_type", insertable = false, updatable = false)
@@ -64,15 +66,18 @@ public abstract class Product extends BaseUpdateEntity {
         this.productStatus = ProductStatus.from(productStatus);
     }
 
-    public void assignProductTags(ProductTag tags) {
-        this.productTags.add(tags);
-        tags.assignProduct(this);
+    public void assignProductTags(List<ProductTag> tags) {
+        checkDuplicateProductTags(tags);
+        for(ProductTag pt : tags){
+            this.productTags.add(pt);
+            pt.assignProduct(this);
+        }
     }
 
     @Transactional
     public void updateProductTags(Product product, List<ProductTag> newTags) {
         product.getProductTags().clear();
-        newTags.forEach(product::assignProductTags);
+        assignProductTags(newTags);
     }
 
     public void assignPrice(int price) {
@@ -87,5 +92,24 @@ public abstract class Product extends BaseUpdateEntity {
             throw new InvalidProductParameterException("stockQuantity는 음수가 될 수 없습니다.");
         }
         this.stockQuantity = stockQuantity;
+    }
+
+    /**
+     * 상품 태그 중복 체크
+     * @param requestProductTags
+     */
+    private void checkDuplicateProductTags(List<ProductTag> requestProductTags) {
+        Map<String, Long> duplicateRequestTagCounts = requestProductTags.stream()
+                .collect(Collectors.groupingBy(ProductTag::getTagName, Collectors.counting()));
+
+        Set<String> duplicateRequestTags = duplicateRequestTagCounts.entrySet().stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        if(!duplicateRequestTags.isEmpty()){
+            throw new DuplicateProductTagsException(duplicateRequestTags);
+        }
+
     }
 }
