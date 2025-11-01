@@ -11,7 +11,6 @@ import org.hibernate.envers.Audited;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Audited
 @Getter
@@ -25,7 +24,7 @@ public class Order extends BaseUpdateEntity {
     private Long id;
 
     @Column(nullable = false)
-    private UUID memberId;
+    private Long memberId;
 
     private LocalDateTime orderedAt; // 주문 일자
 
@@ -36,7 +35,7 @@ public class Order extends BaseUpdateEntity {
     @Column(nullable = false, length = 20)
     private OrderStatus orderStatus;
 
-    public Order(UUID memberId, LocalDateTime orderedAt, List<OrderItem> orderItems) {
+    public Order(Long memberId, LocalDateTime orderedAt, List<OrderItem> orderItems) {
         if (orderItems == null || orderItems.isEmpty()) {
             throw new InvalidArgumentException("상품을 선택해야 주문이 가능합니다.");
         }

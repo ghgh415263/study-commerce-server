@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class MemberWithdrawService {
@@ -21,7 +19,7 @@ public class MemberWithdrawService {
      * 이렇게 해야 누가 삭제했는지 aud 테이블에 정확히 기록된다.
      */
     @Transactional
-    public void withdrawMember(UUID memberId) {
+    public void withdrawMember(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 

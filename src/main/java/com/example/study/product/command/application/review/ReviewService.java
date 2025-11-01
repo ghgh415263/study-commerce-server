@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
@@ -25,7 +23,7 @@ public class ReviewService {
      * @return
      */
     @Transactional
-    public Long saveReview(UUID memberId , ReviewRequestDto dto){
+    public Long saveReview(Long memberId , ReviewRequestDto dto){
         productRepository.findById(dto.productId())
                 .orElseThrow(ProductNotFoundException::new);
         Review review = new Review(memberId, dto.productId(), dto.content(), dto.star());
@@ -39,7 +37,7 @@ public class ReviewService {
      * @return
      */
     @Transactional
-    public Long updateReview(UUID memberId, Long reviewId, ReviewRequestDto dto){
+    public Long updateReview(Long memberId, Long reviewId, ReviewRequestDto dto){
         Review review = reviewRepository.findByReviewId(reviewId).orElseThrow(ReviewNotFoundException::new);
         if (!review.getMemberId().equals(memberId))
             throw new InvalidReviewAuthenticationException();
@@ -52,7 +50,7 @@ public class ReviewService {
      * @param reviewId
      */
     @Transactional
-    public void deleteReview(UUID memberId, Long reviewId){
+    public void deleteReview(Long memberId, Long reviewId){
         Review review = reviewRepository.findByReviewId(reviewId).orElseThrow(ReviewNotFoundException::new);
         if (!review.getMemberId().equals(memberId))
             throw new InvalidReviewAuthenticationException();

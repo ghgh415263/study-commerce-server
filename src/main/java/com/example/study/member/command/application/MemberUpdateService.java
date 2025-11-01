@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class MemberUpdateService {
@@ -18,7 +16,7 @@ public class MemberUpdateService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void updateMember(UUID memberId, MemberUpdateDto dto) {
+    public void updateMember(Long memberId, MemberUpdateDto dto) {
 
         // 회원 조회
         Member member = memberRepository.findById(memberId)

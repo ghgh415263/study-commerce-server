@@ -1,4 +1,4 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.backoffice;
 
 import com.example.study.common.CustomException;
 import org.springframework.http.HttpStatus;
@@ -8,7 +8,11 @@ import org.springframework.http.HttpStatus;
  * HTTP 상태 코드 401 (UNAUTHORIZED)을 반환합니다.
  */
 public class BackofficeUnauthenticatedException extends CustomException {
-    public BackofficeUnauthenticatedException() {
-        super("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+    public BackofficeUnauthenticatedException(String s) {
+        super(s, HttpStatus.UNAUTHORIZED);
+    }
+
+    public BackofficeUnauthenticatedException(String message, Throwable cause) {
+        super(message, HttpStatus.UNAUTHORIZED, cause);
     }
 }

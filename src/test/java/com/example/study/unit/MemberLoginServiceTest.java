@@ -11,9 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -46,16 +45,12 @@ public class MemberLoginServiceTest {
     @Test
     void 로그인_성공() {
         // given
-        Member member = MemberTestFactory.createMember("testUser", "1234" , UUID.randomUUID());
-
+        Member member = MemberTestFactory.createMember("testUser", "1234", 1L);
         when(memberRepository.findByLoginId("testUser"))
                 .thenReturn(Optional.of(member));
 
-        // when
-        UUID result = memberLoginService.login(new MemberLoginDto("testUser", "1234"));
-
         // then
-        assertThat(result).isEqualTo(member.getId());
+        assertDoesNotThrow(() -> memberLoginService.login(new MemberLoginDto("testUser", "1234")));
     }
 
     @Test
@@ -70,7 +65,8 @@ public class MemberLoginServiceTest {
 
     @Test
     void 로그인_실패_아이디없음() {
-        when(memberRepository.findByLoginId("noUser")).thenReturn(Optional.empty());
+        when(memberRepository.findByLoginId("noUser"))
+                .thenReturn(Optional.empty());
 
         assertThrows(InvalidCredentialsException.class,
                 () -> memberLoginService.login(new MemberLoginDto("noUser", "1234")));

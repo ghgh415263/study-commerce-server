@@ -6,15 +6,13 @@ import com.example.study.order.command.domain.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class OrderWallectClientImpl implements OrderWalletClient {
 
     private final WalletRepository walletRepository;
 
-    public void createWallet(UUID memberId){
+    public void createWallet(Long memberId){
         Wallet wallet = new Wallet(memberId);
         walletRepository.save(wallet);
     }

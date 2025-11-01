@@ -1,4 +1,4 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.fo;
 
 import com.example.study.common.CustomException;
 import org.springframework.http.HttpStatus;
@@ -10,5 +10,9 @@ import org.springframework.http.HttpStatus;
 public class UnauthenticatedException extends CustomException {
     public UnauthenticatedException() {
         super("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+    }
+
+    public UnauthenticatedException(String message) {
+        super(message, HttpStatus.UNAUTHORIZED);
     }
 }

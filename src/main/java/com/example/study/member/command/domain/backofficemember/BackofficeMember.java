@@ -1,32 +1,29 @@
 package com.example.study.member.command.domain.backofficemember;
 
-import com.example.study.common.persistance.BaseUpdateEntity;
+import com.example.study.member.command.domain.MemberBase;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
-import java.util.UUID;
-
 @Audited
-@Getter
 @Entity
+@Getter
+@DiscriminatorValue("BACKOFFICE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BackofficeMember extends BaseUpdateEntity {
+public class BackofficeMember extends MemberBase {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @Column(nullable = false, unique = true)
-    private String loginId;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String password;
+    private BackofficeRole role;
 
-    public BackofficeMember(String loginId, String password) {
-        this.loginId = loginId;
-        this.password = password;
+    public BackofficeMember(String loginId, String password, BackofficeRole role) {
+        super(loginId, password);
+        this.role = role;
+    }
+
+    public void changeRole(BackofficeRole newRole) {
+        this.role = newRole;
     }
 }

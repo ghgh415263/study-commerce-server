@@ -4,7 +4,6 @@ import com.example.study.member.command.domain.Member;
 import com.example.study.member.command.domain.MemberStatus;
 
 import java.lang.reflect.Field;
-import java.util.UUID;
 
 public class MemberTestFactory {
 
@@ -33,7 +32,7 @@ public class MemberTestFactory {
         return member;
     }
 
-    public static Member createMember(String loginId, String password, UUID id) {
+    public static Member createMember(String loginId, String password, Long id) {
         Member member = new Member(
                 loginId,
                 password,
@@ -41,18 +40,28 @@ public class MemberTestFactory {
                 "테스트회원",
                 null
         );
-
         setId(member, id);
         return member;
     }
 
-    private static void setId(Member member, UUID id) {
+    private static void setId(Object target, Long id) {
         try {
-            Field field = Member.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(member, id);
+            Class<?> clazz = target.getClass();
+
+            while (clazz != null) {
+                try {
+                    Field field = clazz.getDeclaredField("id");
+                    field.setAccessible(true);
+                    field.set(target, id);
+                    return;
+                } catch (NoSuchFieldException e) {
+                    clazz = clazz.getSuperclass();
+                }
+            }
+
+            throw new NoSuchFieldException("'id' 필드를 찾을 수 없습니다.");
         } catch (Exception e) {
-            throw new RuntimeException("회원 ID 설정에 실패했습니다.", e);
+            throw new RuntimeException("회원 id 설정에 실패했습니다.", e);
         }
     }
 

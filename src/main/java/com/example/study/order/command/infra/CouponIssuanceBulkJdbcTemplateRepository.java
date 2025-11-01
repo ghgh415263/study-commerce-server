@@ -1,12 +1,12 @@
 package com.example.study.order.command.infra;
 
-import com.example.study.common.authentication.UnauthenticatedException;
 import com.example.study.order.command.domain.CouponIssuance;
 import com.example.study.order.command.domain.CouponIssuanceBulkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import com.example.study.common.authentication.fo.UnauthenticatedException;
 
 import java.util.List;
 

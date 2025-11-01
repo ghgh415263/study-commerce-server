@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +24,7 @@ public class OrderCreateService {
     private final CouponIssuanceBulkRepository couponIssuanceBulkRepository;
 
     @Transactional
-    public Long createOrder(CreateOrderDto dto, UUID memberId) {
+    public Long createOrder(CreateOrderDto dto, Long memberId) {
 
         // 상품 ID 추출 + 가격 조회
         List<Long> productIds = dto.items().stream()

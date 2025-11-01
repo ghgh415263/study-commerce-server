@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Import(TestPersistenceAuditorConfig.class)
@@ -36,9 +34,8 @@ public class DeliveryAddressTest {
     @DisplayName("DeliveryAddress를 수정한다")
     void updateNewDeliveryAddress() {
         // given
-        UUID memberId = UUID.randomUUID();
         AddressVO address = new AddressVO("06000", "서울 강남구", "101호");
-        DeliveryAddress deliveryAddress = new DeliveryAddress(memberId, "우리집", address);
+        DeliveryAddress deliveryAddress = new DeliveryAddress(1L, "우리집", address);
         DeliveryAddress saved = deliveryAddressRepository.save(deliveryAddress);
 
         em.flush();
