@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.envers.Audited;
 
 import java.util.Objects;
 
+@ToString(exclude = {"product"})
 @Entity
 @Getter
 @Audited
@@ -42,11 +44,11 @@ public class ProductTag extends BaseUpdateEntity {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ProductTag that = (ProductTag) o;
-        return Objects.equals(tagName, that.tagName) && Objects.equals(product, that.product);
+        return Objects.equals(tagName, that.tagName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagName, product);
+        return Objects.hash(tagName);
     }
 }

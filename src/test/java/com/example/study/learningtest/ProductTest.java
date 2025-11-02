@@ -1,7 +1,7 @@
 package com.example.study.learningtest;
 
 import com.example.study.integration.TestPersistenceAuditorConfig;
-import com.example.study.product.command.application.product.DuplicateProductTagsException;
+import com.example.study.product.command.domain.product.DuplicateProductTagsException;
 import com.example.study.product.command.application.product.ProductNotFoundException;
 import com.example.study.product.command.domain.product.*;
 import com.example.study.product.command.infra.JpaProductRepository;
@@ -223,18 +223,42 @@ public class ProductTest {
                 , 10);
 
         //when
-        List<ProductTag> ProductTagList = new ArrayList<>(
-                Arrays.asList(
-                        new ProductTag("일리"),
-                        new ProductTag("커피머신"),
-                        new ProductTag("일리상품"),
-                        new ProductTag("일리"),
-                        new ProductTag("커피머신")
-                )
+        List<ProductTag> ProductTagList = List.of(
+                new ProductTag("일리"),
+                new ProductTag("커피머신"),
+                new ProductTag("일리상품"),
+                new ProductTag("일리"),
+                new ProductTag("커피머신")
         );
 
         // then
         assertThatThrownBy( () -> deliveryProduct.assignProductTags(ProductTagList))
+                .isInstanceOf(DuplicateProductTagsException.class)
+                .hasMessageContaining("상품 태그는 중복으로 등록할 수 없습니다. 중복 태그 : ");
+    }
+
+    @Test
+    @DisplayName("이미 등록된 상품 태그를 등록하려고 하면")
+    void addDuplicateProductTag(){
+        // given
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
+                , 230000
+                , 2
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+
+        //when
+        List<ProductTag> ProductTagList = List.of(
+                new ProductTag("일리"),
+                new ProductTag("커피머신"),
+                new ProductTag("일리상품")
+        );
+        deliveryProduct.assignProductTags(ProductTagList);
+
+        // then
+        assertThatThrownBy(() -> deliveryProduct.assignProductTags(List.of(new ProductTag("일리"),new ProductTag("커피머신"))))
                 .isInstanceOf(DuplicateProductTagsException.class)
                 .hasMessageContaining("상품 태그는 중복으로 등록할 수 없습니다. 중복 태그 : ");
     }

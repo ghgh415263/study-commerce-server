@@ -1,18 +1,14 @@
 package com.example.study.product.command.domain.product;
 
 import com.example.study.common.persistance.BaseUpdateEntity;
-import com.example.study.product.command.application.product.DuplicateProductTagsException;
 import com.example.study.product.command.application.product.InvalidProductParameterException;
-import com.example.study.product.command.application.product.ProductTagDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -68,13 +64,21 @@ public abstract class Product extends BaseUpdateEntity {
 
     public void assignProductTags(List<ProductTag> tags) {
         checkDuplicateProductTags(tags);
-        for(ProductTag pt : tags){
+
+        List<ProductTag> duplicates = tags.stream()
+                .filter(pt -> this.productTags.contains(pt))
+                .toList();
+
+        if (!duplicates.isEmpty()) {
+            throw new DuplicateProductTagsException(duplicates);
+        }
+
+        tags.forEach(pt -> {
             this.productTags.add(pt);
             pt.assignProduct(this);
-        }
+        });
     }
 
-    @Transactional
     public void updateProductTags(Product product, List<ProductTag> newTags) {
         product.getProductTags().clear();
         assignProductTags(newTags);
@@ -99,17 +103,22 @@ public abstract class Product extends BaseUpdateEntity {
      * @param requestProductTags
      */
     private void checkDuplicateProductTags(List<ProductTag> requestProductTags) {
-        Map<String, Long> duplicateRequestTagCounts = requestProductTags.stream()
-                .collect(Collectors.groupingBy(ProductTag::getTagName, Collectors.counting()));
-
-        Set<String> duplicateRequestTags = duplicateRequestTagCounts.entrySet().stream()
-                .filter(e -> e.getValue() > 1)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-
-        if(!duplicateRequestTags.isEmpty()){
-            throw new DuplicateProductTagsException(duplicateRequestTags);
+        Set<ProductTag> distinctTags = new HashSet<>(requestProductTags);
+        if (distinctTags.size() != requestProductTags.size()) {
+            throw new DuplicateProductTagsException(requestProductTags);
         }
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id != null && id.equals(product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : System.identityHashCode(this);
     }
 }
