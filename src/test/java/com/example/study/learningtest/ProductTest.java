@@ -1,6 +1,7 @@
 package com.example.study.learningtest;
 
 import com.example.study.integration.TestPersistenceAuditorConfig;
+import com.example.study.product.command.domain.product.DuplicateProductTagsException;
 import com.example.study.product.command.application.product.ProductNotFoundException;
 import com.example.study.product.command.domain.product.*;
 import com.example.study.product.command.infra.JpaProductRepository;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,12 +43,8 @@ public class ProductTest {
         productRepository = new JpaProductRepository(em);
     }
 
-    @Test
-    @DisplayName("배송형 상품을 저장한다")
-    void saveDeliveryProduct() throws ProductNotFoundException {
-        // given
-        ProductTag pt1 = new ProductTag("일리");
-        ProductTag pt2 = new ProductTag("커피캡슐");
+    // 테스트 객체
+    private static DeliveryProduct getDeliveryProduct() {
         DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
                 , 230000
                 , 2
@@ -54,8 +52,21 @@ public class ProductTest {
                 , ProductStatus.SOLD_OUT.name()
                 , 1000
                 , 10);
-        deliveryProduct.assignProductTags(pt1);
-        deliveryProduct.assignProductTags(pt2);
+        List<ProductTag> ProductTagList = new ArrayList<>(
+                Arrays.asList(
+                        new ProductTag("일리"),
+                        new ProductTag("커피캡슐")
+                )
+        );
+        deliveryProduct.assignProductTags(ProductTagList);
+        return deliveryProduct;
+    }
+
+    @Test
+    @DisplayName("배송형 상품을 저장한다")
+    void saveDeliveryProduct() throws ProductNotFoundException {
+        // given
+        DeliveryProduct deliveryProduct = getDeliveryProduct();
 
         // when
         Product saved = productRepository.save(deliveryProduct);
@@ -83,17 +94,7 @@ public class ProductTest {
     @DisplayName("배송형 상품을 수정한다")
     void updateDeliveryProduct() throws ProductNotFoundException {
         // given
-        ProductTag pt1 = new ProductTag("일리");
-        ProductTag pt2 = new ProductTag("커피캡슐");
-        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
-                , 230000
-                , 2
-                ,"일리배송형 커피머신입니다."
-                , ProductStatus.SOLD_OUT.name()
-                , 1000
-                , 10);
-        deliveryProduct.assignProductTags(pt1);
-        deliveryProduct.assignProductTags(pt2);
+        DeliveryProduct deliveryProduct = getDeliveryProduct();
 
         // when
         Product saved = productRepository.save(deliveryProduct);
@@ -140,17 +141,7 @@ public class ProductTest {
     @DisplayName("배송형 상품을 삭제한다")
     void deleteDeliveryProduct() {
         // given
-        ProductTag pt1 = new ProductTag("일리");
-        ProductTag pt2 = new ProductTag("커피캡슐");
-        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
-                , 230000
-                , 2
-                ,"일리배송형 커피머신입니다."
-                , ProductStatus.SOLD_OUT.name()
-                , 1000
-                , 10);
-        deliveryProduct.assignProductTags(pt1);
-        deliveryProduct.assignProductTags(pt2);
+        DeliveryProduct deliveryProduct = getDeliveryProduct();
 
         // when
         Product saved = productRepository.save(deliveryProduct);
@@ -180,17 +171,7 @@ public class ProductTest {
     @DisplayName("BackOffice Product 수정(조회)시에는 DB에 Lock을 건다(비관락)")
     void testProductFindLock() throws InterruptedException {
         // given
-        ProductTag pt1 = new ProductTag("일리");
-        ProductTag pt2 = new ProductTag("커피캡슐");
-        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
-                , 230000
-                , 2
-                ,"일리배송형 커피머신입니다."
-                , ProductStatus.SOLD_OUT.name()
-                , 1000
-                , 10);
-        deliveryProduct.assignProductTags(pt1);
-        deliveryProduct.assignProductTags(pt2);
+        DeliveryProduct deliveryProduct = getDeliveryProduct();
 
         // when
         Product saved = productRepository.save(deliveryProduct);
@@ -227,5 +208,58 @@ public class ProductTest {
 
         // then
         assertThatThrownBy(() -> future.get()).hasCauseInstanceOf(PessimisticLockException.class);
+    }
+
+    @Test
+    @DisplayName("중복 상품 태그 함수를 입력하면 DuplicateProductTagsException 예외가 발생한다")
+    void saveDuplicateProductTag(){
+        // given
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
+                , 230000
+                , 2
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+
+        //when
+        List<ProductTag> ProductTagList = List.of(
+                new ProductTag("일리"),
+                new ProductTag("커피머신"),
+                new ProductTag("일리상품"),
+                new ProductTag("일리"),
+                new ProductTag("커피머신")
+        );
+
+        // then
+        assertThatThrownBy( () -> deliveryProduct.assignProductTags(ProductTagList))
+                .isInstanceOf(DuplicateProductTagsException.class)
+                .hasMessageContaining("상품 태그는 중복으로 등록할 수 없습니다. 중복 태그 : ");
+    }
+
+    @Test
+    @DisplayName("이미 등록된 상품 태그를 등록하려고 하면")
+    void addDuplicateProductTag(){
+        // given
+        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
+                , 230000
+                , 2
+                ,"일리배송형 커피머신입니다."
+                , ProductStatus.SOLD_OUT.name()
+                , 1000
+                , 10);
+
+        //when
+        List<ProductTag> ProductTagList = List.of(
+                new ProductTag("일리"),
+                new ProductTag("커피머신"),
+                new ProductTag("일리상품")
+        );
+        deliveryProduct.assignProductTags(ProductTagList);
+
+        // then
+        assertThatThrownBy(() -> deliveryProduct.assignProductTags(List.of(new ProductTag("일리"),new ProductTag("커피머신"))))
+                .isInstanceOf(DuplicateProductTagsException.class)
+                .hasMessageContaining("상품 태그는 중복으로 등록할 수 없습니다. 중복 태그 : ");
     }
 }

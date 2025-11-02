@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,7 @@ public class ProductService {
      */
     @Transactional
     public Long saveDeliveryProduct(ProductRequestDto dto){
+
         DeliveryProduct delivertProduct = new DeliveryProduct(
                 dto.name()
                 , dto.price()
@@ -47,9 +49,12 @@ public class ProductService {
                 , dto.deliveryProduct().fee()
                 , dto.deliveryProduct().weight()
         );
-        for(ProductTagDto productTag : dto.productTags()){
-            delivertProduct.assignProductTags(new ProductTag(productTag.tagName()));
-        }
+
+        List<ProductTag> requestTag = dto.productTags().stream()
+                .map(i -> new ProductTag(i.tagName()))
+                .toList();
+        delivertProduct.assignProductTags(requestTag);
+
         return productRepository.save(delivertProduct).getId();
     }
 
@@ -85,6 +90,7 @@ public class ProductService {
      */
     @Transactional
     public Long saveCouponProduct(ProductRequestDto dto){
+
         CouponProduct couponProduct = new CouponProduct(
                 dto.name()
                 , dto.price()
@@ -94,9 +100,12 @@ public class ProductService {
                 , dto.couponProduct().discountPrice()
                 , dto.couponProduct().effectiveDay()
         );
-        for(ProductTagDto productTag : dto.productTags()){
-            couponProduct.assignProductTags(new ProductTag(productTag.tagName()));
-        }
+
+        List<ProductTag> requestTag = dto.productTags().stream()
+                .map(i -> new ProductTag(i.tagName()))
+                .toList();
+        couponProduct.assignProductTags(requestTag);
+
         return productRepository.save(couponProduct).getId();
     }
 

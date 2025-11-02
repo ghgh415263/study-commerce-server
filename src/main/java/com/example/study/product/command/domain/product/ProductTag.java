@@ -5,12 +5,19 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.envers.Audited;
 
+import java.util.Objects;
+
+@ToString(exclude = {"product"})
 @Entity
 @Getter
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product_tag", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "tagName"})
+})
 public class ProductTag extends BaseUpdateEntity {
 
     @Id
@@ -31,5 +38,17 @@ public class ProductTag extends BaseUpdateEntity {
 
     public void assignProduct(Product product){
         this.product = product;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductTag that = (ProductTag) o;
+        return Objects.equals(tagName, that.tagName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagName);
     }
 }
