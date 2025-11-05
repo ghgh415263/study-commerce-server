@@ -6,7 +6,6 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -27,9 +26,8 @@ public abstract class BaseUpdateEntity extends BaseEntity {
 
     /**
      * 마지막 수정 시간
-     * 엔티티가 수정될 때 자동으로 현재 시간으로 갱신됨
+     * 엔티티가 수정될 때 DB에서 자동으로 현재 시간으로 갱신됨
      */
-    @LastModifiedDate
-    @Column(nullable = false)
+    @Column(updatable = false, insertable = false, nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime modifiedAt;
 }
