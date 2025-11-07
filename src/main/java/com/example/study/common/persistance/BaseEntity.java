@@ -6,7 +6,6 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -27,9 +26,8 @@ public abstract class BaseEntity {
 
     /**
      * 생성된 시간
-     * 자동으로 현재 시간으로 설정됨
+     * DB에서 자동으로 현재 시간으로 설정됨
      */
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false, insertable = false, nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 }
