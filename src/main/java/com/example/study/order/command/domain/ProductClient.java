@@ -11,5 +11,5 @@ public interface ProductClient {
     List<OrderedProduct> getOrderedProducts(List<Long> productIds);
 
     record ProductStockRequest(Long productId, int quantity) {}
-    record OrderedProduct(Long productId, int price) {}
+    record OrderedProduct(Long productId, int price, String productType) {}
 }

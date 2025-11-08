@@ -1,6 +1,6 @@
 package com.example.study.product.query.dao;
 
-import com.example.study.common.Utils.MaskingUtils;
+import com.example.study.common.util.MaskingUtils;
 import lombok.Getter;
 
 import java.util.UUID;

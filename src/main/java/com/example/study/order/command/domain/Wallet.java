@@ -25,7 +25,7 @@ public class Wallet {
     private UUID memberId;
 
     @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal balance = BigDecimal.ZERO; // 기본 0원
+    private BigDecimal balance; // 기본 0원
 
     public Wallet(UUID memberId) {
         this.memberId = memberId;
