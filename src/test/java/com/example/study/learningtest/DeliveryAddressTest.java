@@ -5,9 +5,7 @@ import com.example.study.order.command.application.DeliveryAddressNotFoundExcept
 import com.example.study.order.command.domain.AddressVO;
 import com.example.study.order.command.domain.DeliveryAddress;
 import com.example.study.order.command.domain.DeliveryAddressRepository;
-import com.example.study.order.command.infra.JpaDeliveryAddressRepository;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +21,8 @@ public class DeliveryAddressTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
     private DeliveryAddressRepository deliveryAddressRepository;
-
-    @BeforeEach
-    void setUp() {
-        deliveryAddressRepository = new JpaDeliveryAddressRepository(em);
-    }
 
     @Test
     @DisplayName("DeliveryAddress를 수정한다")

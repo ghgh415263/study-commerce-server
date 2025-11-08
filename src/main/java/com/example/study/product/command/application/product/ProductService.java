@@ -21,7 +21,7 @@ public class ProductService {
      */
     @Transactional
     public ProductResponseDto getProduct(Long productId){
-        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+        Product product = productRepository.findProductById(productId).orElseThrow(ProductNotFoundException::new);
 
         if(product instanceof DeliveryProduct){
             return ProductResponseDto.deliveryProduct(product, ProductType.DELIVERY.name());
@@ -65,7 +65,7 @@ public class ProductService {
      */
     @Transactional
     public void updateDeliveryProduct(Long productId, ProductRequestDto dto){
-        DeliveryProduct deliveryProduct = productRepository.findByDeliveryProductId(productId).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct deliveryProduct = productRepository.findDeliveryProductById(productId).orElseThrow(ProductNotFoundException::new);
 
         deliveryProduct.update(
                 dto.name()
@@ -116,7 +116,7 @@ public class ProductService {
      */
     @Transactional
     public void updateCouponProduct(Long productId, ProductRequestDto dto){
-        CouponProduct couponProduct = productRepository.findByCouponProductId(productId).orElseThrow(ProductNotFoundException::new);
+        CouponProduct couponProduct = productRepository.findCouponProductById(productId).orElseThrow(ProductNotFoundException::new);
 
         couponProduct.update(
                 dto.name()
@@ -140,7 +140,7 @@ public class ProductService {
      */
     @Transactional
     public void deleteProduct(Long productId){
-        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
+        Product product = productRepository.findProductById(productId).orElseThrow(ProductNotFoundException::new);
         productRepository.delete(product);
     }
 }

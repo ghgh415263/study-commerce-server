@@ -1,11 +1,6 @@
 package com.example.study.product.command.domain.review;
 
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReviewRepository {
-    Review save(Review review);
-
-    Optional<Review> findByReviewId(Long reviewId);
-
-    void delete(Review review);
+public interface ReviewRepository extends JpaRepository<Review, Long>{
 }
