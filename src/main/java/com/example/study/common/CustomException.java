@@ -21,4 +21,9 @@ public abstract class CustomException extends RuntimeException {
         super(message);
         this.httpStatus = status;
     }
+
+    protected CustomException(String message, HttpStatus status, Throwable cause) {
+        super(message, cause);
+        this.httpStatus = status;
+    }
 }

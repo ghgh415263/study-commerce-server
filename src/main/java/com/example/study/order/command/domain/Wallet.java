@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Audited
 @Getter
@@ -22,12 +21,12 @@ public class Wallet {
 
     // 회원과 1:1
     @Column(nullable = false, unique = true)
-    private UUID memberId;
+    private Long memberId;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance; // 기본 0원
 
-    public Wallet(UUID memberId) {
+    public Wallet(Long memberId) {
         this.memberId = memberId;
         this.balance = BigDecimal.ZERO;
     }

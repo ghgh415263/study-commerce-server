@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Service
 public class DeliveryAddressService {
@@ -17,7 +15,7 @@ public class DeliveryAddressService {
     private final DeliveryAddressRepository deliveryAddressRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long saveDeliveryAddress(UUID memberId, DeliveryAddressDto dto) {
+    public Long saveDeliveryAddress(Long memberId, DeliveryAddressDto dto) {
         AddressVO addressVO = new AddressVO(
                 dto.zipCode(),
                 dto.baseAddress(),

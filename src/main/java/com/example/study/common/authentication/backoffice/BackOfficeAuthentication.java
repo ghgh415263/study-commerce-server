@@ -1,17 +1,15 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.backoffice;
 
 import lombok.Getter;
-
-import java.util.UUID;
 
 /**
  * 인증된 백오피스 회원의 정보를 담는 객체.
  */
 @Getter
 public class BackOfficeAuthentication {
-    private final UUID backofficeMemberId;
+    private final Long backofficeMemberId;
 
-    public BackOfficeAuthentication(UUID backofficeMemberId) {
+    public BackOfficeAuthentication(Long backofficeMemberId) {
         this.backofficeMemberId = backofficeMemberId;
     }
 }

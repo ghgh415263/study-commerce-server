@@ -1,7 +1,7 @@
 package com.example.study.order.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.fo.Authentication;
 import com.example.study.common.lock.LockTemplate;
 import com.example.study.order.command.application.CreateOrderDto;
 import com.example.study.order.command.application.OrderCreateService;

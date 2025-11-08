@@ -1,5 +1,6 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.backoffice;
 
+import com.example.study.common.authentication.fo.UnauthenticatedException;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

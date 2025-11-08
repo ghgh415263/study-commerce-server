@@ -1,4 +1,4 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.fo;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;

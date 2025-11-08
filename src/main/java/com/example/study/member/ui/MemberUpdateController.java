@@ -1,7 +1,7 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.fo.Authentication;
 import com.example.study.member.command.application.MemberUpdateDto;
 import com.example.study.member.command.application.MemberUpdateService;
 import jakarta.validation.Valid;

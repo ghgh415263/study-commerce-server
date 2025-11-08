@@ -6,8 +6,6 @@ import com.example.study.member.command.domain.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class MemberLoginService {
@@ -16,7 +14,7 @@ public class MemberLoginService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UUID login(MemberLoginDto memberLoginDto) {
+    public Long login(MemberLoginDto memberLoginDto) {
         return memberRepository.findByLoginId(memberLoginDto.loginId())
                 .filter(member -> passwordEncoder.isMatch(memberLoginDto.password(), member.getPassword()))
                 .map(Member::getId)

@@ -6,8 +6,6 @@ import com.example.study.member.command.domain.backofficemember.BackofficeMember
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class BackofficeMemberLoginService {
@@ -16,7 +14,7 @@ public class BackofficeMemberLoginService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UUID login(BackofficeMemberLoginDto backofficeMemberLoginDto) {
+    public Long login(BackofficeMemberLoginDto backofficeMemberLoginDto) {
         return backofficeMemberRepository.findByLoginId(backofficeMemberLoginDto.loginId())
                 .filter(member -> passwordEncoder.isMatch(backofficeMemberLoginDto.password(), member.getPassword()))
                 .map(BackofficeMember::getId)

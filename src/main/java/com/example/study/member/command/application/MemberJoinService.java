@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 /**
  * 회원 가입 서비스를 담당하는 클래스입니다.
  */
@@ -35,7 +33,7 @@ public class MemberJoinService {
      * @return 저장된 회원의 ID
      */
     @Transactional
-    public UUID saveMember(MemberJoinDto memberJoinDto) {
+    public Long saveMember(MemberJoinDto memberJoinDto) {
 
         if (passwordMeter.isWeak(memberJoinDto.password()))
             throw new WeakPasswordException();

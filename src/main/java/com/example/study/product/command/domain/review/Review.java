@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
-import java.util.UUID;
-
 @Getter
 @Entity
 @Audited
@@ -24,7 +22,7 @@ public class Review extends BaseUpdateEntity {
     private Long productId;
 
     @Column(name = "member_id", nullable = false)
-    private UUID memberId;
+    private Long memberId;
 
     @Column(nullable = false)
     private String content;
@@ -32,7 +30,7 @@ public class Review extends BaseUpdateEntity {
     @Column(nullable = false)
     private int star;
 
-    public Review(UUID memberId, Long productId, String content, int star){
+    public Review(Long memberId, Long productId, String content, int star){
         this.memberId = memberId;
         this.productId = productId;
         this.content = content;

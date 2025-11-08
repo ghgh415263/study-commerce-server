@@ -1,7 +1,7 @@
 package com.example.study.product.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.fo.Authentication;
 import com.example.study.product.command.application.review.ReviewRequestDto;
 import com.example.study.product.command.application.review.ReviewService;
 import jakarta.validation.Valid;

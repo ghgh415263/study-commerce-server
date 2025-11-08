@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class MemberChangePasswordService {
@@ -17,7 +15,7 @@ public class MemberChangePasswordService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void changePassword(UUID memberId, String oldPassword, String newPassword) {
+    public void changePassword(Long memberId, String oldPassword, String newPassword) {
 
         Member member = memberRepository.findById(memberId)
                 .filter(m -> passwordEncoder.isMatch(oldPassword, m.getPassword()))

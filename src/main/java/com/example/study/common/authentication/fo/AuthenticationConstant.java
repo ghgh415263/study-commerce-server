@@ -1,4 +1,4 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.fo;
 
 public class AuthenticationConstant {
     public static final String AUTHENTICATION = "AUTHENTICATION";

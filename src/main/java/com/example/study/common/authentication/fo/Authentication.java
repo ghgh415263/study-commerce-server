@@ -1,8 +1,6 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.fo;
 
 import lombok.Getter;
-
-import java.util.UUID;
 
 /**
  * 인증된 회원의 정보를 담는 객체.
@@ -10,9 +8,9 @@ import java.util.UUID;
  */
 @Getter
 public class Authentication {
-    private final UUID memberId;
+    private final Long memberId;
 
-    public Authentication(UUID memberId) {
+    public Authentication(Long memberId) {
         this.memberId = memberId;
     }
 }

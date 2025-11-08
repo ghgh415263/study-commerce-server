@@ -1,6 +1,7 @@
 package com.example.study.unit;
 
 import com.example.study.common.GlobalExceptionHandler;
+import com.example.study.common.authentication.JwtConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(controllers =  TestController.class)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, JwtConfig.class})
 public class GlobalExceptionHandlerTest {
 
     @Autowired

@@ -1,7 +1,7 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.common.authentication.Authentication;
+import com.example.study.common.authentication.fo.Authentication;
 import com.example.study.member.command.application.MemberChangePasswordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

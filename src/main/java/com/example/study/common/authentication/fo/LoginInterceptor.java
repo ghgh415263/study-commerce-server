@@ -1,8 +1,9 @@
-package com.example.study.common.authentication;
+package com.example.study.common.authentication.fo;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
@@ -10,34 +11,52 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * 로그인된 사용자 ID를 {@link AuthenticationHolder}에 저장하는 인터셉터입니다.
  *
  * 요청이 끝나면 {@code ThreadLocal}에 저장된 사용자 정보를 정리합니다.
- *
- * <p>이 인터셉터는 컨트롤러 진입 전에 세션에 로그인 정보가 없을 경우 예외를 발생시키고,
- * 이후 로직에서는 {@link AuthenticationContext}를 통해 사용자 ID에 접근할 수 있도록 합니다.</p>
  */
+@RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {
-
-    private static final String LOGIN_SESSION_KEY = AuthenticationConstant.AUTHENTICATION;
-
     /**
      * 요청이 컨트롤러에 도달하기 전에 호출되며,
-     * 세션에 로그인 정보가 없을 경우 {@link UnauthenticatedException}을 발생시킵니다.
-     * 로그인 정보가 있으면 {@link AuthenticationHolder}에 사용자 ID를 저장합니다.
+     * 쿠키에 토큰 정보가 없을 경우 {@link UnauthenticatedException}을 발생시킵니다.
+     * 로그인 토큰 정보가 있으면 {@link AuthenticationHolder}에 {@link Authentication}를 저장합니다.
      *
      * @return {@code true}일 경우 요청 처리를 계속 진행하고,
      *         {@code false}일 경우 처리를 중단합니다.
      * @throws UnauthenticatedException 로그인 세션이 없거나 인증 정보가 없을 때
      */
+    private final TokenManager tokenManager;
+
+    private static final String TOKEN_COOKIE_NAME = "AUTH_TOKEN";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute(LOGIN_SESSION_KEY) == null) {
-            throw new UnauthenticatedException();
+        String token = extractTokenFromCookie(request);
+        if (token == null) {
+            throw new UnauthenticatedException("토큰이 없습니다.");
         }
 
-        Authentication authentication = (Authentication) session.getAttribute(LOGIN_SESSION_KEY);
-        AuthenticationHolder.set(authentication);
-        return true;
+        try {
+            // JWT 검증 및 ID 추출
+            Authentication authentication = tokenManager.getAuthentication(token);
+            AuthenticationHolder.set(authentication);
+            return true;
+
+        } catch (Exception e) {
+            throw new UnauthenticatedException("유효하지 않은 토큰입니다.");
+        }
+    }
+
+    private String extractTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if (TOKEN_COOKIE_NAME.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 
     /**

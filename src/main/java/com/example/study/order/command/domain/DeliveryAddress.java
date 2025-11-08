@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
-import java.util.UUID;
-
 @Getter
 @Entity
 @Audited
@@ -20,7 +18,7 @@ public class DeliveryAddress extends BaseUpdateEntity {
     private Long id;
 
     @Column(name = "member_id", nullable = false)
-    private UUID memberId;
+    private Long memberId;
 
     @Column(nullable = false)
     private String name;
@@ -28,7 +26,7 @@ public class DeliveryAddress extends BaseUpdateEntity {
     @Embedded
     private AddressVO address;
 
-    public DeliveryAddress(UUID memberId, String name, AddressVO address) {
+    public DeliveryAddress(Long memberId, String name, AddressVO address) {
         this.memberId = memberId;
         this.name = name;
         this.address = address;
