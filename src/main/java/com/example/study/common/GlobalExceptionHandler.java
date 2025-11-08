@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -107,6 +108,17 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleException(Exception ex) {
+
+        // 브라우저 자동 요청 무시
+        if(ex instanceof NoResourceFoundException nrf){
+            String path = nrf.getResourcePath();
+            if (path.startsWith(".well-known") ||
+                    path.endsWith(".css.map") ||
+                    path.equals("favicon.ico")) {
+                return null;
+            }
+        }
+
         // 내부 로그 남기기
         log.error("Unexpected error occurred", ex);
 

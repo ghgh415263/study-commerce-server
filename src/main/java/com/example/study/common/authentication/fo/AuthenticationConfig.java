@@ -31,7 +31,10 @@ public class AuthenticationConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(backofficeLoginInterceptor)
                 .addPathPatterns("/backoffice/**")
-                .excludePathPatterns("/backoffice/login");
+                .excludePathPatterns(
+                        "/backoffice/login",
+                        "/backoffice/api/login"
+                );
     }
 
     @Override

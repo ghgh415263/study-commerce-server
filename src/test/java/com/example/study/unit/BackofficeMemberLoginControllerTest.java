@@ -2,12 +2,9 @@ package com.example.study.unit;
 
 import com.example.study.common.authentication.JwtConfig;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
-import com.example.study.common.authentication.fo.Authentication;
-import com.example.study.common.authentication.backoffice.BackoffIceAuthenticationConstant;
 import com.example.study.member.command.application.BackofficeMemberLoginService;
-import com.example.study.member.ui.BackofficeMemberLoginController;
+import com.example.study.member.ui.backoffice.BackofficeMemberLoginController;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,7 @@ public class BackofficeMemberLoginControllerTest {
         given(backofficeTokenManager.generateToken(memberId)).willReturn(token);
 
         // when
-        MvcResult result = mockMvc.perform(post("/backoffice/login")
+        MvcResult result = mockMvc.perform(post("/backoffice/api/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {
