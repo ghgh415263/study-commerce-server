@@ -29,7 +29,7 @@ public class ProductClientImpl implements ProductClient {
                 .toList();
 
         // 상품 조회 + 비관적 락
-        List<Product> products = productRepository.findAllByIds(productIds);
+        List<Product> products = productRepository.findAllByIdIn(productIds);
 
         // Map으로 쉽게 조회
         Map<Long, Product> productMap = products.stream()
@@ -52,7 +52,7 @@ public class ProductClientImpl implements ProductClient {
 
     @Override
     public List<OrderedProduct> getOrderedProducts(List<Long> productIds) {
-        return productRepository.findAllByIds(productIds).stream()
+        return productRepository.findAllByIdIn(productIds).stream()
                 .map(p -> new OrderedProduct(p.getId(), p.getPrice(), p.getProductType().name()))
                 .collect(Collectors.toList());
     }

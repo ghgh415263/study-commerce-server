@@ -38,7 +38,7 @@ public class ReviewService {
      */
     @Transactional
     public Long updateReview(Long memberId, Long reviewId, ReviewRequestDto dto){
-        Review review = reviewRepository.findByReviewId(reviewId).orElseThrow(ReviewNotFoundException::new);
+        Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
         if (!review.getMemberId().equals(memberId))
             throw new InvalidReviewAuthenticationException();
         review.update(dto.content(), dto.star());
@@ -51,7 +51,7 @@ public class ReviewService {
      */
     @Transactional
     public void deleteReview(Long memberId, Long reviewId){
-        Review review = reviewRepository.findByReviewId(reviewId).orElseThrow(ReviewNotFoundException::new);
+        Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
         if (!review.getMemberId().equals(memberId))
             throw new InvalidReviewAuthenticationException();
         reviewRepository.delete(review);

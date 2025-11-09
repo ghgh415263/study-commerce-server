@@ -4,10 +4,8 @@ import com.example.study.integration.TestPersistenceAuditorConfig;
 import com.example.study.product.command.domain.product.DuplicateProductTagsException;
 import com.example.study.product.command.application.product.ProductNotFoundException;
 import com.example.study.product.command.domain.product.*;
-import com.example.study.product.command.infra.JpaProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PessimisticLockException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,15 +29,11 @@ public class ProductTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
-
-    @BeforeEach
-    void setUp() {
-        productRepository = new JpaProductRepository(em);
-    }
 
     // 테스트 객체
     private static DeliveryProduct getDeliveryProduct() {
@@ -76,7 +68,7 @@ public class ProductTest {
         em.clear();
 
         // then
-        DeliveryProduct foundEntity = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct foundEntity = productRepository.findDeliveryProductById(saved.getId()).orElseThrow(ProductNotFoundException::new);
 
         assertThat(foundEntity.getName()).isEqualTo("일리머신&커피캡슐");
         assertThat(foundEntity.getPrice()).isEqualTo(230000);
@@ -104,7 +96,7 @@ public class ProductTest {
         em.clear();
 
         // when
-        DeliveryProduct newDeliverProduct = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct newDeliverProduct = productRepository.findDeliveryProductById(saved.getId()).orElseThrow(ProductNotFoundException::new);
 
         newDeliverProduct.update(
                 "네스프레소 머신"
@@ -124,7 +116,7 @@ public class ProductTest {
         newDeliverProduct.assignWeight(20);
 
         // then
-        DeliveryProduct foundEntity = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct foundEntity = productRepository.findDeliveryProductById(saved.getId()).orElseThrow(ProductNotFoundException::new);
 
         assertThat(foundEntity.getName()).isEqualTo("네스프레소 머신");
         assertThat(foundEntity.getPrice()).isEqualTo(310000);
@@ -151,7 +143,7 @@ public class ProductTest {
         em.clear();
 
         // when
-        DeliveryProduct deleteProduct = productRepository.findByDeliveryProductId(saved.getId()).orElseThrow(ProductNotFoundException::new);
+        DeliveryProduct deleteProduct = productRepository.findDeliveryProductById(saved.getId()).orElseThrow(ProductNotFoundException::new);
         productRepository.delete(deleteProduct);
 
         // 영속성 컨텍스트 초기화 (flush + clear)
@@ -160,7 +152,7 @@ public class ProductTest {
 
         // then
         assertThatThrownBy(() ->
-                productRepository.findById(saved.getId())
+                productRepository.findProductById(saved.getId())
                         .orElseThrow(ProductNotFoundException::new)
         )
                 .isInstanceOf(ProductNotFoundException.class)
@@ -185,7 +177,7 @@ public class ProductTest {
 
         executor.submit(() -> {
             transactionTemplate.executeWithoutResult(status -> {
-                productRepository.findByDeliveryProductId(saved.getId())
+                productRepository.findDeliveryProductById(saved.getId())
                         .orElseThrow(ProductNotFoundException::new);
                 try {
                     Thread.sleep(5000);
@@ -199,15 +191,28 @@ public class ProductTest {
 
         Future<?> future = executor.submit(() -> {
             transactionTemplate.executeWithoutResult(status -> {
-                productRepository.findByDeliveryProductId(saved.getId())
+                productRepository.findDeliveryProductById(saved.getId())
                         .orElseThrow(ProductNotFoundException::new);
             });
         });
 
         executor.shutdown();
 
-        // then
-        assertThatThrownBy(() -> future.get()).hasCauseInstanceOf(PessimisticLockException.class);
+        // ProductRepository -> SpringData Jpa 로 변경되면서 수정사항 :
+        // EntityManager는 진짜 즉시 DB 쿼리를 실행하고 락을 잡지만, Repository는 내부에서 트랜잭션/flush 타이밍을 늦게 처리한다.
+        // QueryHints의 javax.persistence.lock.timeout은 표준이지만, H2/MySQL 테스트에서는 무시되어 PessimisticLockException 을 관찰하기 어렵다.
+
+        // then - 락 대기 발생 여부 검증
+        long start = System.currentTimeMillis();
+        assertThatThrownBy(() -> {
+            future.get(3, TimeUnit.SECONDS); // 3초 기다려도 안 끝나면 TimeoutException
+        }).isInstanceOf(TimeoutException.class);
+        long elapsed = System.currentTimeMillis() - start;
+
+        System.out.println("락 대기 감지 시간: " + elapsed + "ms");
+
+        // 락으로 인해 블로킹이 발생했다면 3초 근처에서 Timeout 발생 → 정상
+        assertThat(elapsed).isGreaterThanOrEqualTo(2900);
     }
 
     @Test

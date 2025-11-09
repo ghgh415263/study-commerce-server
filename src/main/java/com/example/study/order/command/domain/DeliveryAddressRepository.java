@@ -1,10 +1,6 @@
 package com.example.study.order.command.domain;
 
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DeliveryAddressRepository {
-
-    DeliveryAddress save(DeliveryAddress deliveryAddress);
-
-    Optional<DeliveryAddress> findById(Long id);
+public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, Long> {
 }
