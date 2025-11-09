@@ -23,6 +23,16 @@ spring:
         format_sql: true                        # 출력되는 SQL 쿼리를 보기 좋게 포맷팅
         highlight_sql: true                     # 콘솔에서 SQL 쿼리를 하이라이트 처리 (색상)
 
+  thymeleaf:
+    encoding: UTF-8
+    cache: false    # 캐시 설정
+    prefix: classpath:/templates/
+    suffix: .html
+
+  messages:
+    basename: messages
+    encoding: UTF-8
+
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
