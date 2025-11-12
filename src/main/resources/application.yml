@@ -30,7 +30,7 @@ spring:
     suffix: .html
 
   messages:
-    basename: messages
+    basename: messages,errors
     encoding: UTF-8
 
 mybatis:
@@ -38,7 +38,7 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
-logging:
+
   level:
     org:
       hibernate:

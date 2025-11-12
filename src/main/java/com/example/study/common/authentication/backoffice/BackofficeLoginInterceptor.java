@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.io.IOException;
+
 import static com.example.study.common.authentication.backoffice.BackoffIceAuthenticationConstant.BACKOFFICE_AUTHENTICATION;
 
 /**
@@ -21,11 +23,13 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
     private final BackofficeTokenManager backofficeTokenManager;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
         String token = extractTokenFromCookie(request);
         if (token == null) {
-            throw new BackofficeUnauthenticatedException("토큰이 없습니다.");
+//                throw new BackofficeUnauthenticatedException("토큰이 없습니다.");
+            response.sendRedirect("/backoffice/login");
+            return false;
         }
 
         try {
@@ -34,7 +38,9 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
             return true;
 
         } catch (Exception e) {
-            throw new BackofficeUnauthenticatedException("유효하지 않은 토큰입니다.");
+//                throw new BackofficeUnauthenticatedException("유효하지 않은 토큰입니다.");
+            response.sendRedirect("/backoffice/login");
+            return false;
         }
     }
 
