@@ -53,12 +53,6 @@ public class BackofficeMemberLoginController {
         // View validation
         if(bindingResult.hasErrors()){
             log.debug("erros={}", bindingResult);
-            // BindingResult 객체는 FlashAttribute로 보낼 수는 있지만, 뷰에서 다시 자동으로 연결되지는 않는다.(테스트 코드 쪽으로 뺴기)
-//            redirectAttributes.addFlashAttribute("login", loginDto);
-//            redirectAttributes.addFlashAttribute(
-//                    "org.springframework.validation.BindingResult.login", bindingResult
-//            );
-//            return "redirect:/backoffice/login";
             return "backoffice/login";
         }
 

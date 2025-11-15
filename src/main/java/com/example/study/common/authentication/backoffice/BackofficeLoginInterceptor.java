@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -17,18 +18,22 @@ import static com.example.study.common.authentication.backoffice.BackoffIceAuthe
  *
  * 요청 종료 시 {@code ThreadLocal}에 저장된 백오피스 사용자 정보를 정리합니다.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class BackofficeLoginInterceptor implements HandlerInterceptor {
 
     private final BackofficeTokenManager backofficeTokenManager;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         String token = extractTokenFromCookie(request);
         if (token == null) {
-//                throw new BackofficeUnauthenticatedException("토큰이 없습니다.");
-            response.sendRedirect("/backoffice/login");
+            try {
+                response.sendRedirect("/backoffice/login");
+            } catch (IOException e) {
+                log.info("Failed to redirect to /backoffice/login due to missing token: {}", e.getMessage());
+            }
             return false;
         }
 
@@ -38,8 +43,11 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
             return true;
 
         } catch (Exception e) {
-//                throw new BackofficeUnauthenticatedException("유효하지 않은 토큰입니다.");
-            response.sendRedirect("/backoffice/login");
+            try {
+                response.sendRedirect("/backoffice/login");
+            } catch (IOException ioException) {
+                log.info("Failed to redirect after authentication error: {}", ioException.getMessage());
+            }
             return false;
         }
     }
