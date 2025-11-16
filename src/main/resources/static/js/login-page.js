@@ -2,8 +2,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const errorInputs = document.querySelectorAll("input.field-error-input");
 
-//    console.log("field-error input 요소 개수:", errorInputs.length);
-
     errorInputs.forEach(function (input) {
         input.addEventListener("input", function () {
             if (this.value.trim().length > 0) {

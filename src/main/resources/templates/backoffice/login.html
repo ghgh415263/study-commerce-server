@@ -29,11 +29,6 @@
 
     <form th:action="@{/backoffice/login}" th:object="${login}" method="post">
 
-        <!--
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
-        </div>
-        -->
         <div th:if="${loginError}" class="field-error" th:text="${loginError}"></div>
 
         <div>
