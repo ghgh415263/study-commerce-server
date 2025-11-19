@@ -8,11 +8,6 @@ spring:
       mode: always       # schema.sql 실행
       encoding: UTF-8
 
-  datasource:
-    url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-    username: testuser
-    password: testpass
-    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update                          # 애플리케이션 실행 시 DB 스키마 자동 업데이트

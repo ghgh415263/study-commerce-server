@@ -3,6 +3,7 @@ package com.example.study.integration;
 import com.example.study.common.event.OutboxEvent;
 import com.example.study.common.event.OutboxEventBulkRepository;
 import com.example.study.common.event.OutboxEventBulkRepositoryImpl;
+import com.example.study.common.persistance.JdbcConnectionDetailsConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(TestPersistenceAuditorConfig.class)
+@Import({TestPersistenceAuditorConfig.class, JdbcConnectionDetailsConfig.class})
 public class OutboxEventBulkRepositoryTest {
 
     @Autowired
