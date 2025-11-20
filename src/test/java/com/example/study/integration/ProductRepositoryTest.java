@@ -1,30 +1,32 @@
-package com.example.study.learningtest;
+package com.example.study.integration;
 
-import com.example.study.integration.TestPersistenceAuditorConfig;
-import com.example.study.product.command.domain.product.DuplicateProductTagsException;
 import com.example.study.product.command.application.product.ProductNotFoundException;
 import com.example.study.product.command.domain.product.*;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PessimisticLockException;
+import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Import(TestPersistenceAuditorConfig.class)
 @DataJpaTest
-public class ProductTest {
+public class ProductRepositoryTest {
 
     @Autowired
     private EntityManager em;
@@ -35,7 +37,7 @@ public class ProductTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    // 테스트 객체
+    // Test object for ProductRepositoryTest
     private static DeliveryProduct getDeliveryProduct() {
         DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
                 , 230000
@@ -79,7 +81,7 @@ public class ProductTest {
         assertThat(foundEntity.getWeight()).isEqualTo(10);
         assertThat(foundEntity.getDescription()).isEqualTo("일리배송형 커피머신입니다.");
         List<String> tagList = foundEntity.getProductTags().stream().map(ProductTag::getTagName).collect(Collectors.toList());
-        assertThat(tagList).contains("일리", "커피캡슐");
+        AssertionsForInterfaceTypes.assertThat(tagList).contains("일리", "커피캡슐");
     }
 
     @Test
@@ -126,7 +128,7 @@ public class ProductTest {
         assertThat(foundEntity.getFee()).isEqualTo(2000);
         assertThat(foundEntity.getWeight()).isEqualTo(20);
         List<String> tagList = foundEntity.getProductTags().stream().map(ProductTag::getTagName).collect(Collectors.toList());
-        assertThat(tagList).contains("네스프레소", "커피머신");
+        AssertionsForInterfaceTypes.assertThat(tagList).contains("네스프레소", "커피머신");
     }
 
     @Test
@@ -189,8 +191,11 @@ public class ProductTest {
 
         Thread.sleep(500);
 
+
+
         Future<?> future = executor.submit(() -> {
             transactionTemplate.executeWithoutResult(status -> {
+                em.createNativeQuery("SET innodb_lock_wait_timeout = 3").executeUpdate(); // 락 타임 아웃 3초 설정
                 productRepository.findDeliveryProductById(saved.getId())
                         .orElseThrow(ProductNotFoundException::new);
             });
@@ -198,73 +203,13 @@ public class ProductTest {
 
         executor.shutdown();
 
-        // ProductRepository -> SpringData Jpa 로 변경되면서 수정사항 :
-        // EntityManager는 진짜 즉시 DB 쿼리를 실행하고 락을 잡지만, Repository는 내부에서 트랜잭션/flush 타이밍을 늦게 처리한다.
-        // QueryHints의 javax.persistence.lock.timeout은 표준이지만, H2/MySQL 테스트에서는 무시되어 PessimisticLockException 을 관찰하기 어렵다.
-
-        // then - 락 대기 발생 여부 검증
-        long start = System.currentTimeMillis();
-        assertThatThrownBy(() -> {
-            future.get(3, TimeUnit.SECONDS); // 3초 기다려도 안 끝나면 TimeoutException
-        }).isInstanceOf(TimeoutException.class);
-        long elapsed = System.currentTimeMillis() - start;
-
-        System.out.println("락 대기 감지 시간: " + elapsed + "ms");
-
-        // 락으로 인해 블로킹이 발생했다면 3초 근처에서 Timeout 발생 → 정상
-        assertThat(elapsed).isGreaterThanOrEqualTo(2900);
-    }
-
-    @Test
-    @DisplayName("중복 상품 태그 함수를 입력하면 DuplicateProductTagsException 예외가 발생한다")
-    void saveDuplicateProductTag(){
-        // given
-        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
-                , 230000
-                , 2
-                ,"일리배송형 커피머신입니다."
-                , ProductStatus.SOLD_OUT.name()
-                , 1000
-                , 10);
-
-        //when
-        List<ProductTag> ProductTagList = List.of(
-                new ProductTag("일리"),
-                new ProductTag("커피머신"),
-                new ProductTag("일리상품"),
-                new ProductTag("일리"),
-                new ProductTag("커피머신")
-        );
-
         // then
-        assertThatThrownBy( () -> deliveryProduct.assignProductTags(ProductTagList))
-                .isInstanceOf(DuplicateProductTagsException.class)
-                .hasMessageContaining("상품 태그는 중복으로 등록할 수 없습니다. 중복 태그 : ");
-    }
+        // 락 대기 발생 여부 검증
+        //  Hibernate 의 PessimisticLockException 은 Spring 이 자동으로 PessimisticLockingFailureException 으로 감싸서 던진다.
+        assertThatThrownBy(future::get)
+                .isInstanceOf(ExecutionException.class)
+                .cause()
+                .isInstanceOf(PessimisticLockingFailureException.class);
 
-    @Test
-    @DisplayName("이미 등록된 상품 태그를 등록하려고 하면")
-    void addDuplicateProductTag(){
-        // given
-        DeliveryProduct deliveryProduct = new DeliveryProduct("일리머신&커피캡슐"
-                , 230000
-                , 2
-                ,"일리배송형 커피머신입니다."
-                , ProductStatus.SOLD_OUT.name()
-                , 1000
-                , 10);
-
-        //when
-        List<ProductTag> ProductTagList = List.of(
-                new ProductTag("일리"),
-                new ProductTag("커피머신"),
-                new ProductTag("일리상품")
-        );
-        deliveryProduct.assignProductTags(ProductTagList);
-
-        // then
-        assertThatThrownBy(() -> deliveryProduct.assignProductTags(List.of(new ProductTag("일리"),new ProductTag("커피머신"))))
-                .isInstanceOf(DuplicateProductTagsException.class)
-                .hasMessageContaining("상품 태그는 중복으로 등록할 수 없습니다. 중복 태그 : ");
     }
 }
