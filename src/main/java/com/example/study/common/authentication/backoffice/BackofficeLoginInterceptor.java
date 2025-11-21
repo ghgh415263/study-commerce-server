@@ -1,20 +1,32 @@
 package com.example.study.common.authentication.backoffice;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.io.IOException;
 
 import static com.example.study.common.authentication.backoffice.BackoffIceAuthenticationConstant.BACKOFFICE_AUTHENTICATION;
 
 /**
- * 인증된 백오피스 사용자만 접근 가능한 요청에 대해 세션 로그인 상태를 검사하고,
- * 로그인된 관리자 ID를 {@link BackofficeAuthenticationHolder}에 저장하는 인터셉터입니다.
+ * 백오피스 관리자 전용 요청에 대해 인증 토큰을 검증하는 인터셉터입니다.
  *
- * 요청 종료 시 {@code ThreadLocal}에 저장된 백오피스 사용자 정보를 정리합니다.
+ * 요청 쿠키에서 {@code BACKOFFICE_AUTHENTICATION} 토큰을 추출하여
+ * 유효한 토큰일 경우 {@link BackofficeAuthenticationHolder} 에 인증 정보를 저장합니다.
+ * 이를 통해 컨트롤러에서 인증된 관리자 정보를 조회할 수 있습니다.
+ *
+ * 토큰이 존재하지 않거나 검증에 실패한 경우 요청 처리를 중단하고
+ * 백오피스 로그인 페이지({@code /backoffice/login})로 리다이렉트합니다.
+ *
+ * 요청이 정상 종료되거나 예외로 종료되는 경우,
+ * {@code ThreadLocal} 에 저장된 인증 정보는 afterCompletion 단계에서 정리됩니다.
+ *
  */
+@Slf4j
 @RequiredArgsConstructor
 public class BackofficeLoginInterceptor implements HandlerInterceptor {
 
@@ -24,8 +36,10 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         String token = extractTokenFromCookie(request);
+
         if (token == null) {
-            throw new BackofficeUnauthenticatedException("토큰이 없습니다.");
+            redirectToLoginPage(response);
+            return false;
         }
 
         try {
@@ -34,10 +48,13 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
             return true;
 
         } catch (Exception e) {
-            throw new BackofficeUnauthenticatedException("유효하지 않은 토큰입니다.");
+            log.warn("백오피스 인증 실패={}", e.getMessage());
+            redirectToLoginPage(response);
+            return false;
         }
     }
 
+    @Nullable
     private String extractTokenFromCookie(HttpServletRequest request) {
         if (request.getCookies() == null) {
             return null;
@@ -49,6 +66,14 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
             }
         }
         return null;
+    }
+
+    private void redirectToLoginPage(HttpServletResponse response) {
+        try {
+            response.sendRedirect("/backoffice/login");
+        } catch (IOException e) {
+            log.error("Failed to redirect to login page", e);
+        }
     }
 
     @Override

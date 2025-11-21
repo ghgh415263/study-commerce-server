@@ -12,28 +12,30 @@
             border-color: #dc3545;
             color: #dc3545;
         }
+        .field-error-input {
+            border-color: #dc3545;
+            color: #dc3545;
+            background-color: #ffe6e6;
+        }
     </style>
 </head>
+<script th:src="@{/js/login-page.js}"></script>
 <body>
-
 <div class="container">
 
     <div class="py-5 text-center">
         <h2 th:text="#{page.addlogin}">backoffice 로그인</h2>
     </div>
 
-    <div th:if="${loginError}" class="field-error" th:text="${loginError}"></div>
+    <form th:action="@{/backoffice/login}" th:object="${login}" method="post">
 
-    <form action="login.html" th:action th:object="${login}" method="post">
-
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
-        </div>
+        <div th:if="${loginError}" class="field-error" th:text="${loginError}"></div>
 
         <div>
             <label for="loginId" th:text="#{label.login.id}">아이디</label>
             <input type="text" id="loginId" th:field="*{loginId}"
-                   th:errorclass="field-error" class="form-control" placeholder="아이디를 입력하세요">
+                   th:errorclass="field-error-input" class="form-control"
+                   th:attr="placeholder=${#fields.hasErrors('loginId')} ? '' : '아이디를 입력하세요'">
             <div class="field-error" th:errors="*{loginId}">
                 아이디 오류
             </div>
@@ -41,7 +43,8 @@
         <div>
             <label for="password" th:text="#{label.login.password}">비밀번호</label>
             <input type="text" id="password" th:field="*{password}"
-                   th:errorclass="field-error" class="form-control" placeholder="비밀번호를 입력하세요">
+                   th:errorclass="field-error-input" class="form-control"
+                   th:attr="placeholder=${#fields.hasErrors('password')} ? '' : '비밀번호를 입력하세요'">
             <div class="field-error" th:errors="*{password}">
                 비밀번호 오류
             </div>
@@ -62,6 +65,6 @@
 
     </form>
 
-</div> <!-- /container -->
+</div>
 </body>
 </html>
