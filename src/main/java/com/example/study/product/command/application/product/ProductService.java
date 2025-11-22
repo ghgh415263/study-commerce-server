@@ -70,14 +70,13 @@ public class ProductService {
         deliveryProduct.update(
                 dto.name()
                 , dto.price()
-                , dto.stockQuantity()
                 , dto.description()
                 , dto.productStatus());
 
         List<ProductTag> newTags = dto.productTags().stream()
                 .map(productTagDto -> new ProductTag(productTagDto.tagName()))
                 .toList();
-        deliveryProduct.updateProductTags(deliveryProduct, newTags);
+        deliveryProduct.updateProductTags(newTags);
 
         deliveryProduct.assignFee(dto.deliveryProduct().fee());
         deliveryProduct.assignWeight(dto.deliveryProduct().weight());
@@ -121,14 +120,13 @@ public class ProductService {
         couponProduct.update(
                 dto.name()
                 , dto.price()
-                , dto.stockQuantity()
                 , dto.description()
                 , dto.productStatus());
 
         List<ProductTag> newTags = dto.productTags().stream()
                 .map(productTagDto -> new ProductTag(productTagDto.tagName()))
                 .toList();
-        couponProduct.updateProductTags(couponProduct, newTags);
+        couponProduct.updateProductTags(newTags);
 
         couponProduct.assignDiscountPrice(dto.couponProduct().discountPrice());
         couponProduct.assignEffectiveDay(dto.couponProduct().effectiveDay());

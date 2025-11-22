@@ -103,7 +103,6 @@ public class ProductRepositoryTest {
         newDeliverProduct.update(
                 "네스프레소 머신"
                 ,310000
-                , 1
                 , "네스프레소 머신입니다"
                 , "ON_SALE");
 
@@ -112,7 +111,7 @@ public class ProductRepositoryTest {
         ProductTag newPt2 = new ProductTag("커피머신");
         newTags.add(newPt1);
         newTags.add(newPt2);
-        newDeliverProduct.updateProductTags(newDeliverProduct, newTags);
+        newDeliverProduct.updateProductTags(newTags);
 
         newDeliverProduct.assignFee(2000);
         newDeliverProduct.assignWeight(20);
@@ -122,7 +121,6 @@ public class ProductRepositoryTest {
 
         assertThat(foundEntity.getName()).isEqualTo("네스프레소 머신");
         assertThat(foundEntity.getPrice()).isEqualTo(310000);
-        assertThat(foundEntity.getStockQuantity()).isEqualTo(1);
         assertThat(foundEntity.getDescription()).isEqualTo("네스프레소 머신입니다");
         assertThat(foundEntity.getProductStatus().toString()).isEqualTo("ON_SALE");
         assertThat(foundEntity.getFee()).isEqualTo(2000);

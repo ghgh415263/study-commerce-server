@@ -46,7 +46,7 @@ public class ProductClientImpl implements ProductClient {
                 throw new InvalidArgumentException("재고 부족: " + req.productId());
             }
 
-            product.assignStockQuantity(product.getStockQuantity() - req.quantity());
+            product.decreaseStock(req.quantity());
         }
     }
 
