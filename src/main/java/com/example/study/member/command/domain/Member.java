@@ -1,6 +1,6 @@
 package com.example.study.member.command.domain;
 
-import com.example.study.order.command.domain.AddressVO;
+import com.example.study.order.order.command.domain.AddressVO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
