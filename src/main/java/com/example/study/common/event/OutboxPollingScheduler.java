@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -30,22 +31,28 @@ public class OutboxPollingScheduler {
      *
      * 단일 서버 환경에서는 현재 구조가 가장 단순하고 안정적이므로 유지함.
      */
-    @Scheduled(fixedDelay = 3000)
     @Transactional
+    @Scheduled(fixedDelay = 1000)
     public void pollAndSendOutboxEvents() {
+
         List<OutboxEvent> events = outboxEventRepository.findTop10ByStatusOrderByOccurredAtAsc(OutboxEventStatus.INIT);
 
-        for (OutboxEvent event : events) {
-            try {
-                // Kafka 전송
-                kafkaTemplate.send(event.getTopic(), event.getPartitionKey(), event.getPayload());
+        if (events.isEmpty()) return;
 
-                // 상태 변경
+        for (OutboxEvent event : events) {
+
+            try {
+                // future 기다림
+                kafkaTemplate.send(event.getTopic(), event.getPartitionKey(), event.getPayload())
+                        .get(1, TimeUnit.SECONDS);
+
+                // 2) send 성공 → SUCCESS
                 event.changeStatus(OutboxEventStatus.SUCCESS);
-                log.info("Sent outbox event: {}", event.getId());
+
             } catch (Exception e) {
-                event.changeStatus(OutboxEventStatus.FAIL);
-                log.error("Failed to send outbox event: {}", event.getId(), e);
+                // 실패시 로그찍고 재시도 하기위해서 break 해버림
+                log.error("outbox 발행 실패 id={}, 재시도할 것임", event.getId(), e);
+                break;
             }
         }
     }
