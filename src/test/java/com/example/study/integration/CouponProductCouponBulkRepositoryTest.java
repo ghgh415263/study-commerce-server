@@ -1,5 +1,6 @@
 package com.example.study.integration;
 
+import com.example.study.common.persistance.JdbcConnectionDetailsConfig;
 import com.example.study.order.couponproductcoupon.command.CouponProductCoupon;
 import com.example.study.order.couponproductcoupon.command.CouponProductCouponBulkRepository;
 import com.example.study.order.couponproductcoupon.command.CouponProductCouponBulkRepositoryImpl;
@@ -17,7 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(TestPersistenceAuditorConfig.class)
+@Import({TestPersistenceAuditorConfig.class, JdbcConnectionDetailsConfig.class})
 @DataJpaTest
 public class CouponProductCouponBulkRepositoryTest {
 
