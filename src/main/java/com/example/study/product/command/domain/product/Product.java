@@ -23,7 +23,7 @@ public abstract class Product extends BaseUpdateEntity {
     @Column(name = "product_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -39,7 +39,9 @@ public abstract class Product extends BaseUpdateEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus = ProductStatus.SOLD_OUT;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    //ElementCollection 은 기본이 LAZY
+    @ElementCollection
+    @CollectionTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"))
     private Set<ProductTag> productTags = new HashSet<>();
 
     // 읽기 전용
@@ -50,15 +52,15 @@ public abstract class Product extends BaseUpdateEntity {
     public Product(String name, int price, int stockQuantity, String description, String productStatus) {
         this.name = name;
         assignPrice(price);
-        assignStockQuantity(stockQuantity);
+        if (stockQuantity < 0) throw new InvalidProductParameterException("stockQuantity는 음수가 될 수 없습니다.");
+        this.stockQuantity = stockQuantity;
         this.description = description;
         this.productStatus = ProductStatus.from(productStatus);
     }
 
-    public void update(String name, int price, int stockQuantity, String description, String productStatus) {
+    public void update(String name, int price, String description, String productStatus) {
         this.name = name;
         assignPrice(price);
-        assignStockQuantity(stockQuantity);
         this.description = description;
         this.productStatus = ProductStatus.from(productStatus);
     }
@@ -74,14 +76,11 @@ public abstract class Product extends BaseUpdateEntity {
             throw new DuplicateProductTagsException(duplicates);
         }
 
-        tags.forEach(pt -> {
-            this.productTags.add(pt);
-            pt.assignProduct(this);
-        });
+        this.productTags.addAll(tags);
     }
 
-    public void updateProductTags(Product product, List<ProductTag> newTags) {
-        product.getProductTags().clear();
+    public void updateProductTags(List<ProductTag> newTags) {
+        this.productTags.clear();
         assignProductTags(newTags);
     }
 
@@ -92,11 +91,11 @@ public abstract class Product extends BaseUpdateEntity {
         this.price = price;
     }
 
-    public void assignStockQuantity(int stockQuantity) {
-        if (stockQuantity < 0) {
+    public void decreaseStock(int amount) {
+        if (this.stockQuantity - amount < 0) {
             throw new InvalidProductParameterException("stockQuantity는 음수가 될 수 없습니다.");
         }
-        this.stockQuantity = stockQuantity;
+        this.stockQuantity -= amount;
     }
 
     /**
@@ -110,16 +109,4 @@ public abstract class Product extends BaseUpdateEntity {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return id != null && id.equals(product.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : System.identityHashCode(this);
-    }
 }
