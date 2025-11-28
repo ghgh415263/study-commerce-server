@@ -16,6 +16,7 @@ import java.util.UUID;
 public class CouponProductCoupon extends BaseUpdateEntity {
 
     @Id
+    @Column(name = "coupon_product_coupon_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,12 +30,16 @@ public class CouponProductCoupon extends BaseUpdateEntity {
     @Column(nullable = false, length = 20)
     private CouponProductCouponStatus status;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 20)
     private String contact;
 
     private LocalDateTime issuedAt;
 
     public CouponProductCoupon(Long orderItemId, String contact) {
+        if (orderItemId == null || orderItemId <= 0) {
+            throw new InvalidArgumentException("잘못된 주문 상품 정보입니다.");
+        }
+
         if (contact == null) {
             throw new InvalidArgumentException("쿠폰을 발급할 연락처를 입력해주세요.");
         }

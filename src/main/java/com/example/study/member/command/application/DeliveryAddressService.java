@@ -1,8 +1,8 @@
-package com.example.study.order.order.command.application;
+package com.example.study.member.command.application;
 
-import com.example.study.order.order.command.domain.AddressVO;
-import com.example.study.order.order.command.domain.DeliveryAddress;
-import com.example.study.order.order.command.domain.DeliveryAddressRepository;
+import com.example.study.member.command.domain.AddressVO;
+import com.example.study.member.command.domain.DeliveryAddress;
+import com.example.study.member.command.domain.DeliveryAddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

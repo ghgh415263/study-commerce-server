@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.infra;
+package com.example.study.member.command.infra;
 
 import com.example.study.member.command.domain.PasswordEncoder;
 import org.mindrot.jbcrypt.BCrypt;

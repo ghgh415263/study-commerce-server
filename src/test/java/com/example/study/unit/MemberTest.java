@@ -3,7 +3,7 @@ package com.example.study.unit;
 import com.example.study.member.command.domain.InvalidMemberStateException;
 import com.example.study.member.command.domain.Member;
 import com.example.study.member.command.domain.MemberStatus;
-import com.example.study.order.order.command.domain.AddressVO;
+import com.example.study.member.command.domain.AddressVO;
 import com.example.study.unit.help.MemberTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

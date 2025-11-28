@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class Wallet {
 
     @Id
+    @Column(name = "wallet_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

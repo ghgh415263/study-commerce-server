@@ -1,10 +1,10 @@
-package com.example.study.order.order.ui;
+package com.example.study.member.ui;
 
 import com.example.study.common.authentication.fo.Authentication;
 import com.example.study.common.lock.LockTemplate;
-import com.example.study.order.order.command.application.DeliveryAddressDto;
-import com.example.study.order.order.command.application.DeliveryAddressRequestDto;
-import com.example.study.order.order.command.application.DeliveryAddressService;
+import com.example.study.member.command.application.DeliveryAddressDto;
+import com.example.study.member.command.application.DeliveryAddressRequestDto;
+import com.example.study.member.command.application.DeliveryAddressService;
 import com.example.study.common.ApiSuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
