@@ -85,12 +85,6 @@ public class OrderCreateService {
             deliveryRepository.save(delivery);
         }
 
-        System.out.println("BEFORE RETURN: txActive=" +
-                TransactionSynchronizationManager.isActualTransactionActive());
-
-        System.out.println("tx name: " +
-                TransactionSynchronizationManager.getCurrentTransactionName());
-
         orderDomainEventPublisher.publish(new OrderCreatedEvent(totalPrice, order, dto.couponIssueContact()));
 
         return order.getId();
