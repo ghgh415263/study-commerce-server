@@ -1,5 +1,5 @@
 # 프로젝트 목적 및 진행 내역
-매주 학습한 내용을 실습하기 위해, 이커머스 애플리케이션을 주제로 토이 프로젝트를 진행하고 적용 가능한 이슈를 팀원들과 함께 만들어 해결하고 있습니다.
+학습한 내용을 실습하기 위해, 이커머스 애플리케이션을 주제로 토이 프로젝트를 진행하고 적용 가능한 이슈를 팀원과 함께 만들어 해결하고 있습니다.
 
 ### 현재 진행 내역
 - [x] **Spring 기반 백엔드 개발**  
@@ -20,6 +20,28 @@
 ### 컨텍스트별 패키지
 컨텍스트마다 반복되는 패키지 구조를 그림으로 나타냈습니다.<br>
 <img width="450" height="538" alt="image" src="https://github.com/user-attachments/assets/c1d118ec-01e6-49c2-b277-a760a1042cca" />
+
+
+1. UI Layer
+    - 사용자가 시스템에 어떻게 접근하고 데이터를 주고받는지 담당
+    - Controller, DTO, 단순 Validation 등 API/화면 입출력 처리
+
+2. Application Layer
+    - 도메인을 어떤 흐름으로 사용할지 정의하는 유스케이스 계층
+    - 트랜잭션 경계 설정, 도메인 객체 조합 및 orchestration
+
+3. Domain Layer
+    - 비즈니스 규칙의 핵심 (Entity, Value Object, Domain Service, Aggregate)
+    - 기술 의존 최소화, 순수한 자바 기반 구현 (구현의 편의성으로 jpa 관련 코드는 약간 허용)
+
+4. Infra Layer
+    - DB 접근, 메시지 브로커, 외부 API 등 기술 요소 구현
+    - 기술 변경이 이 레이어에 집중되도록 분리
+
+5. DAO Layer (Query/Read Model)
+    - 도메인 규칙이 거의 필요 없는 조회 전용 계층
+    - 화면/리스트/검색 등 UI 요구에 맞춘 데이터 조회
+    - Domain/Application을 통과하지 않고 UI → DAO → Infra 구조로 처리
 
 <br>
 
@@ -64,10 +86,12 @@
 
 <br>
 
-# 컨텍스트별 ERD
+# 컨텍스트별 물리적 ERD
 현재는 회원, 주문, 상품 컨텍스트를 유지중
 
 ### Member Context
 ### Order Context
+<img width="1697" height="1049" alt="image" src="https://github.com/user-attachments/assets/d2ee5a00-eaa2-4dff-a475-520a4b350b2f" />
+
 ### Product Context
 <img width="961" height="435" alt="505640443-359189eb-6044-4464-86dc-02c9c5ddd4eb" src="https://github.com/user-attachments/assets/60c8cd9f-d758-420f-ae9b-801ebfb0d492" />
