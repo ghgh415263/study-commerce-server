@@ -1,6 +1,6 @@
 package com.example.study.common.authentication.fo;
 
-import jakarta.servlet.http.Cookie;
+import com.example.study.common.util.AuthenticationUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,38 +25,26 @@ public class LoginInterceptor implements HandlerInterceptor {
      */
     private final TokenManager tokenManager;
 
-    private static final String TOKEN_COOKIE_NAME = "AUTH_TOKEN";
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String token = extractTokenFromCookie(request);
-        if (token == null) {
-            throw new UnauthenticatedException("토큰이 없습니다.");
-        }
+        String token = AuthenticationUtils.extractTokenFromCookie(request,
+                () -> new UnauthenticatedException("토큰이 없습니다."));
 
         try {
-            // JWT 검증 및 ID 추출
             Authentication authentication = tokenManager.getAuthentication(token);
             AuthenticationHolder.set(authentication);
             return true;
 
+        } catch (JwtValidateTokenExpiration jwtException) {
+
+            response.addHeader("Set-Cookie", AuthenticationUtils.expireLoginCookie());
+
+            throw jwtException;
+
         } catch (Exception e) {
             throw new UnauthenticatedException("유효하지 않은 토큰입니다.");
         }
-    }
-
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            return null;
-        }
-
-        for (Cookie cookie : request.getCookies()) {
-            if (TOKEN_COOKIE_NAME.equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
     }
 
     /**

@@ -2,6 +2,7 @@ package com.example.study.common.authentication;
 
 import com.example.study.common.authentication.backoffice.BackofficeLoginInterceptor;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
+import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.common.authentication.fo.LoginInterceptor;
 import com.example.study.common.authentication.fo.TokenManager;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,12 @@ import java.security.NoSuchAlgorithmException;
 
 @Configuration
 public class JwtConfig {
+
+    private final JwtBlacklistRepository jwtBlacklistRepository;
+
+    public JwtConfig(JwtBlacklistRepository jwtBlacklistRepository) {
+        this.jwtBlacklistRepository = jwtBlacklistRepository;
+    }
 
     @Bean
     public KeyPair localKeyPair() {
@@ -27,7 +34,7 @@ public class JwtConfig {
 
     @Bean
     public TokenManager tokenManager() {
-        return new TokenManager(localKeyPair());
+        return new TokenManager(localKeyPair(), jwtBlacklistRepository);
     }
 
     @Bean

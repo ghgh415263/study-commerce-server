@@ -1,5 +1,6 @@
 package com.example.study.unit;
 
+import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.common.authentication.fo.TokenManager;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,11 +17,12 @@ public class TokenManagerTest {
 
     private TokenManager tokenManager;
     private KeyPair keyPair;
+    private JwtBlacklistRepository jwtBlacklistRepository;
 
     @BeforeEach
     void setUp() {
         keyPair = FixedKeyPairFactory.loadFixedKeyPair(); // 항상 같은 RSA 키
-        tokenManager = new TokenManager(keyPair);
+        tokenManager = new TokenManager(keyPair, jwtBlacklistRepository);
     }
 
     @Test
