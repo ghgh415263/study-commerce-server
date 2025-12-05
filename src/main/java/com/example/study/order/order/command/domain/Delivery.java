@@ -1,5 +1,6 @@
 package com.example.study.order.order.command.domain;
 
+import com.example.study.common.InvalidArgumentException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.util.List;
 public class Delivery {
 
     @Id
+    @Column(name = "delivery_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -53,10 +55,21 @@ public class Delivery {
     }
 
     public void addDeliveryItems(List<Long> orderItemIds) {
+        if (this.status != DeliveryStatus.NOT_STARTED) {
+            throw new InvalidArgumentException("NOT_STARTED 상태에서만 배송 아이템을 추가할 수 있습니다.");
+        }
+
         for (Long orderItemId : orderItemIds) {
-            DeliveryItem item = new DeliveryItem(orderItemId);
-            item.setDelivery(this); // 양방향 연관관계 주입
-            deliveryItems.add(item);
+            boolean exists = deliveryItems.stream()
+                    .anyMatch(i -> i.getOrderItemId().equals(orderItemId));
+
+            if (exists) {
+                throw new IllegalArgumentException("이미 추가된 OrderItemId입니다: " + orderItemId);
+            }
+
+            DeliveryItem deliveryItem = new DeliveryItem(orderItemId);
+            deliveryItem.setDelivery(this);
+            deliveryItems.add(deliveryItem);
         }
     }
 

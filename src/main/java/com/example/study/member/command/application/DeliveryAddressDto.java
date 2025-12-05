@@ -1,14 +1,8 @@
-package com.example.study.order.order.command.application;
+package com.example.study.member.command.application;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 
-public record DeliveryAddressRequestDto (
-
-        @NotNull(message = "id는 필수입니다.")
-        @Positive(message = "id는 0이나 음수가 될 수 없습니다.")
-        Long id,
+public record DeliveryAddressDto(
 
         @NotBlank(message = "배송지 이름은 필수입니다.")
         String name,
@@ -22,4 +16,3 @@ public record DeliveryAddressRequestDto (
         @NotBlank(message = "상세 주소는 필수입니다.")
         String detailAddress
 ) {}
-

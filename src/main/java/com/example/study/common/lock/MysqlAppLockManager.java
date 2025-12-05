@@ -1,6 +1,5 @@
-package com.example.study.order.order.command.infra;
+package com.example.study.common.lock;
 
-import com.example.study.common.lock.LockManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;

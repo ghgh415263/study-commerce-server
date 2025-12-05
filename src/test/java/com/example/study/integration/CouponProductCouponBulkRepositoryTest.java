@@ -50,7 +50,7 @@ public class CouponProductCouponBulkRepositoryTest {
         repository.saveAll(entities);
 
         // then
-        List<Long> ids = jdbcTemplate.queryForList("SELECT id FROM coupon_product_coupon", Long.class);
+        List<Long> ids = jdbcTemplate.queryForList("SELECT coupon_product_coupon_id FROM coupon_product_coupon", Long.class);
         assertThat(ids).hasSize(50);
 
         // 저장된 엔티티의 id가 1씩 증가하는지 검증

@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class OrderItem extends BaseUpdateEntity {
 
     @Id
+    @Column(name = "order_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -26,33 +27,33 @@ public class OrderItem extends BaseUpdateEntity {
     @Column(nullable = false)
     private Long productId;
 
+    @Embedded
+    private OrderedProductSnapshot productSnapshot;
+
     @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal priceAtOrder; // 주문 당시 단가
-
-    private String productType;
-
-    private OrderItem(Long productId, int quantity, BigDecimal priceAtOrder, String productType) {
-        this.productId = productId;
+    private OrderItem(OrderedProductSnapshot productSnapshot, int quantity, Long productId) {
+        this.productSnapshot = productSnapshot;
         this.quantity = quantity;
-        this.priceAtOrder = priceAtOrder;
-        this.productType = productType;
+        this.productId = productId;
     }
 
-    public static OrderItem of(Long productId, int quantity, BigDecimal priceAtOrder, String productType) {
-        if (quantity < 1) {
+    public static OrderItem of(Long productId,
+                               String productName,
+                               BigDecimal priceAtOrder,
+                               String productType,
+                               int quantity) {
+
+        if (quantity < 1)
             throw new IllegalArgumentException("수량은 1 이상이어야 합니다.");
-        }
-        if (priceAtOrder.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
-        }
-        return new OrderItem(productId, quantity, priceAtOrder, productType);
+
+        OrderedProductSnapshot snapshot = OrderedProductSnapshot.of(productName, priceAtOrder, productType);
+
+        return new OrderItem(snapshot, quantity, productId);
     }
 
     void setOrder(Order order) {
         this.order = order;
     }
-
 }

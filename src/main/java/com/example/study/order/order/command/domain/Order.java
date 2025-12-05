@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class Order extends BaseUpdateEntity {
 
     @Id
+    @Column(name = "order_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -48,5 +50,18 @@ public class Order extends BaseUpdateEntity {
     public void addOrderItem(OrderItem item) {
         orderItems.add(item);
         item.setOrder(this);
+    }
+
+    /**
+     * 총 주문 금액 계산
+     */
+    public BigDecimal calculateTotalPrice() {
+        return orderItems.stream()
+                .map(item ->
+                        item.getProductSnapshot()
+                                .getPrice()
+                                .multiply(BigDecimal.valueOf(item.getQuantity()))
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

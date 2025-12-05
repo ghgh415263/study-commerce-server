@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.application;
+package com.example.study.member.command.application;
 
 import com.example.study.common.CustomException;
 import org.springframework.http.HttpStatus;
