@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.domain;
+package com.example.study.order.wallet;
 
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;

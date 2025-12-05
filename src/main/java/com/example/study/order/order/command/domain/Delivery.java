@@ -28,7 +28,7 @@ public class Delivery {
     private DeliveryStatus status;
 
     // 배송 주소
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String address;
 
     // 배송 연락처 (전화번호)
@@ -39,6 +39,9 @@ public class Delivery {
     @Column(unique = true, length = 50)
     private String trackingNumber;
 
+    @Column(unique = true)
+    private Long orderId;
+
     // 배송 시작 일시
     private LocalDateTime shippedAt;
 
@@ -48,10 +51,11 @@ public class Delivery {
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryItem> deliveryItems = new ArrayList<>();
 
-    public Delivery(DeliveryStatus status, String address, String contact) {
-        this.status = status;
+    public Delivery(String address, String contact, Long orderId) {
+        this.status = DeliveryStatus.NOT_STARTED;
         this.address = address;
         this.contact = contact;
+        this.orderId = orderId;
     }
 
     public void addDeliveryItems(List<Long> orderItemIds) {
@@ -88,5 +92,12 @@ public class Delivery {
         }
         this.deliveredAt = LocalDateTime.now();
         this.status = DeliveryStatus.DELIVERED;
+    }
+
+    public void cancel() {
+        if (this.status != DeliveryStatus.NOT_STARTED && this.status != DeliveryStatus.READY) {
+            throw new InvalidDeliveryStateException("취소 할 수 없는 배달입니다.");
+        }
+        this.status =  DeliveryStatus.CANCELED;
     }
 }

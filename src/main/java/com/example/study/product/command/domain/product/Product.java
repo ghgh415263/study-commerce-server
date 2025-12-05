@@ -98,6 +98,14 @@ public abstract class Product extends BaseUpdateEntity {
         this.stockQuantity -= amount;
     }
 
+    public void increaseStock(int amount) {
+        if (amount < 0) {
+            throw new InvalidProductParameterException("재고 증가량은 음수일 수 없습니다.");
+        }
+
+        this.stockQuantity += amount;
+    }
+
     /**
      * 상품 태그 중복 체크
      * @param requestProductTags

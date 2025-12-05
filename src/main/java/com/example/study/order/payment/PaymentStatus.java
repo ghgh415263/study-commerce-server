@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.domain;
+package com.example.study.order.payment;
 
 public enum PaymentStatus {
     PENDING,    // 결제 대기

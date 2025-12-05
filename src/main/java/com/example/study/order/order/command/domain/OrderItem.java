@@ -56,4 +56,9 @@ public class OrderItem extends BaseUpdateEntity {
     void setOrder(Order order) {
         this.order = order;
     }
+
+    public boolean isCoupon() {
+        return this.productSnapshot.getProductType() != null && this.productSnapshot.getProductType().equalsIgnoreCase("COUPON");
+    }
+
 }
