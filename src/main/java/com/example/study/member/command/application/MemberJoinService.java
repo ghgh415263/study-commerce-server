@@ -1,7 +1,7 @@
 package com.example.study.member.command.application;
 
 import com.example.study.member.command.domain.*;
-import com.example.study.order.order.command.domain.AddressVO;
+import com.example.study.member.command.domain.AddressVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

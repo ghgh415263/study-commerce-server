@@ -1,8 +1,8 @@
 package com.example.study.integration;
 
-import com.example.study.order.order.command.domain.AddressVO;
-import com.example.study.order.order.command.domain.DeliveryAddress;
-import com.example.study.order.order.command.domain.DeliveryAddressRepository;
+import com.example.study.member.command.domain.AddressVO;
+import com.example.study.member.command.domain.DeliveryAddress;
+import com.example.study.member.command.domain.DeliveryAddressRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

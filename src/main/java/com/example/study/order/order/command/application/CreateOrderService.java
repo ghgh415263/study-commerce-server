@@ -4,7 +4,6 @@ import com.example.study.order.order.command.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class OrderCreateService {
+public class CreateOrderService {
 
     private final OrderRepository orderRepository;
     private final WalletRepository walletRepository;
@@ -31,7 +30,13 @@ public class OrderCreateService {
                 .map(OrderItemDto::productId)
                 .toList();
 
-        Map<Long, ProductClient.OrderedProduct> priceMap = productClient.getOrderedProducts(productIds)
+        // 주문된 상품 정보 가져옴
+        List<ProductClient.OrderedProduct> orderedProducts = productClient.getOrderedProducts(productIds);
+        if (productIds.size() != orderedProducts.size()) {
+            throw new OrderedProductNotFoundException(productIds);
+        }
+
+        Map<Long, ProductClient.OrderedProduct> priceMap = orderedProducts
                 .stream()
                 .collect(Collectors.toMap(ProductClient.OrderedProduct::productId, p -> p));
 
@@ -40,7 +45,8 @@ public class OrderCreateService {
                 .map(itemDto -> {
                     BigDecimal price = BigDecimal.valueOf(priceMap.get(itemDto.productId()).price());
                     String productType = priceMap.get(itemDto.productId()).productType();
-                    return OrderItem.of(itemDto.productId(), itemDto.quantity(), price, productType);
+                    String productName = priceMap.get(itemDto.productId()).name();
+                    return OrderItem.of(itemDto.productId(), productName, price, productType, itemDto.quantity());
                 })
                 .toList();
 
@@ -55,9 +61,7 @@ public class OrderCreateService {
         orderRepository.save(order);
 
         // 총 금액 계산
-        BigDecimal totalPrice = items.stream()
-                .map(i -> i.getPriceAtOrder().multiply(BigDecimal.valueOf(i.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPrice = order.calculateTotalPrice();
 
         // Wallet에서 금액 차감
         Wallet wallet = walletRepository.findByMemberId(memberId)

@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.domain;
+package com.example.study.member.command.domain;
 
 import com.example.study.common.persistance.BaseUpdateEntity;
 import jakarta.persistence.*;

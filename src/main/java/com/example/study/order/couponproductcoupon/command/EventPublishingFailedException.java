@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 /**
  * 메시지 발행 실패
  */
-public class EventPublishFailException extends CustomException {
+public class EventPublishingFailedException extends CustomException {
 
-    public EventPublishFailException(String message, Throwable cause) {
+    public EventPublishingFailedException(String message, Throwable cause) {
         super(message, HttpStatus.INTERNAL_SERVER_ERROR, cause);
     }
 }

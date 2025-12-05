@@ -1,6 +1,6 @@
 package com.example.study.integration;
 
-import com.example.study.order.order.command.infra.MysqlAppLockManager;
+import com.example.study.common.lock.MysqlAppLockManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;

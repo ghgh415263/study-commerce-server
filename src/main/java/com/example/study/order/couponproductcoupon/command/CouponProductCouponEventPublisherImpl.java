@@ -90,7 +90,7 @@ public class CouponProductCouponEventPublisherImpl implements CouponProductCoupo
                 );
 
             } catch (JsonProcessingException e) {
-                throw new EventPublishFailException("이벤트 직렬화에 실패했습니다. event=" + eventPayload, e);
+                throw new EventPublishingFailedException("이벤트 직렬화에 실패했습니다. event=" + eventPayload, e);
             }
         }).toList();
     }

@@ -17,10 +17,11 @@ import java.time.LocalDateTime;
 public class Payment extends BaseUpdateEntity {
 
     @Id
+    @Column(name = "payment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long OrderId;
 
     // 결제 금액
