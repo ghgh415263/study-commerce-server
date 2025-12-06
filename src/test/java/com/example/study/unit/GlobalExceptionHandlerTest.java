@@ -2,10 +2,12 @@ package com.example.study.unit;
 
 import com.example.study.common.GlobalExceptionHandler;
 import com.example.study.common.authentication.JwtConfig;
+import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -19,6 +21,9 @@ public class GlobalExceptionHandlerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private JwtBlacklistRepository jwtBlacklistRepository; /* JwtConfig.class 대응 */
 
     @Test
     void generalExceptionReturnsJsonString() throws Exception {

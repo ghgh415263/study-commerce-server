@@ -2,6 +2,7 @@ package com.example.study.unit;
 
 import com.example.study.common.authentication.JwtConfig;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
+import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.member.command.application.BackofficeMemberLoginService;
 import com.example.study.member.test.TestBackofficeMemberLoginController;
 import jakarta.servlet.http.Cookie;
@@ -34,6 +35,9 @@ public class TestBackofficeMemberLoginControllerTest {
 
     @MockitoBean
     private BackofficeTokenManager backofficeTokenManager;
+
+    @MockitoBean
+    private JwtBlacklistRepository jwtBlacklistRepository; /* JwtConfig.class 대응 */
 
     @Test
     @DisplayName("로그인 성공 시 토큰생성되고 응답은 200")
