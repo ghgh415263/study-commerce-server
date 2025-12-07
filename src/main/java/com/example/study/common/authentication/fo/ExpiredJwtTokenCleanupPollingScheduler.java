@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,21 +20,25 @@ public class ExpiredJwtTokenCleanupPollingScheduler {
     private final JwtBlacklistRepository jwtBlacklistRepository;
 
     /**
-     * ExpiredJwtTokenCleanupPollingScheduler
-     *  DB에서 주기적으로 만료일자(expired_at)이 지난 JWT 데이터를 삭제한다.
-     *  로그아웃시 로그아웃일자(logout_at)을 비교하기 때문에 fixedDelay를 빈번하게 설정하지 않아도 된다.
+     * 주기적으로 DB에서 만료(expired_at < now)된 JWT 블랙리스트 데이터를 삭제한다.
      *
+     * batch size(1000개)로 끊어서 삭제하면 대량 데이터에서도 Lock/부하가 적음.
      */
     @Transactional
-    @Scheduled(fixedDelay = 30000)
-    public void expiredJwtTokenCleanup(){
-        List<JwtBlacklist> expiredList = jwtBlacklistRepository.findByExpiredAtBefore(LocalDateTime.now());
-        if(!expiredList.isEmpty()){
-            try{
-                jwtBlacklistRepository.deleteAllInBatch(expiredList);
-            } catch (Exception e){
-                log.error("로그인 만료 jwt 삭제 오류 ={}", e.getMessage());
-            }
+    @Scheduled(cron = "0 0 * * * *")  // 매 시간 정각 실행
+    public void cleanupExpiredTokens() {
+        Instant now = Instant.now();
+
+        log.info("[JWT Cleanup] 시작: 시각={}", now);
+
+        int totalDeleted = 0;
+
+        while (true) {
+            int deleted = jwtBlacklistRepository.deleteExpired(now, 1000);
+            totalDeleted += deleted;
+            if (deleted < 1000) break;
         }
+
+        log.info("[JWT Cleanup] 완료: {}개의 만료된 JWT 레코드를 삭제", totalDeleted);
     }
 }

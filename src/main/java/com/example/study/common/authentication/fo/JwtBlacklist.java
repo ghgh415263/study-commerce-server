@@ -1,6 +1,6 @@
 package com.example.study.common.authentication.fo;
 
-import com.example.study.common.persistance.BaseUpdateEntity;
+import com.example.study.common.persistance.BaseEntity;
 import com.example.study.common.util.AuthenticationUtils;
 import com.example.study.member.command.domain.Member;
 import jakarta.persistence.*;
@@ -9,14 +9,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Audited
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JwtBlacklist extends BaseUpdateEntity  {
+public class JwtBlacklist extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,19 +25,18 @@ public class JwtBlacklist extends BaseUpdateEntity  {
     @Column(nullable = false, unique = true)
     private String jwtHashId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column(nullable = false)
+    private Long memberId;
 
     @Column(nullable = false)
-    private Date expiredAt;
+    private Instant  expiredAt;
 
     @Column(nullable = false)
     private LocalDateTime logoutAt;
 
-    public JwtBlacklist(String jwt, Member member, Date expiredAt, LocalDateTime logoutAt){
+    public JwtBlacklist(String jwt, Long memberId, Instant expiredAt, LocalDateTime logoutAt){
         this.jwtHashId = AuthenticationUtils.hashJwtWithSHA256(jwt);
-        this.member = member;
+        this.memberId = memberId;
         this.expiredAt = expiredAt;
         this.logoutAt = logoutAt;
     }

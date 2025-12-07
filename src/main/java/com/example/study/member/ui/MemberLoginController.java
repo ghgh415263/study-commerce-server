@@ -9,21 +9,17 @@ import com.example.study.member.command.application.MemberNotFoundException;
 import com.example.study.member.command.domain.Member;
 import com.example.study.member.command.domain.MemberRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.KeyPair;
-import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,9 +28,6 @@ public class MemberLoginController {
     private final MemberLoginService memberLoginService;
     private final TokenManager tokenManager;
     private final JwtBlacklistRepository jwtBlacklistRepository;
-    private final MemberRepository memberRepository;
-
-    private final KeyPair keyPair;
 
     @PostMapping("/login")
     public ApiSuccessResponse<Void> login(
@@ -53,20 +46,12 @@ public class MemberLoginController {
     @PostMapping("/logout")
     public ApiSuccessResponse<Void> logout(
             HttpServletRequest request,
-            HttpServletResponse response){
+            HttpServletResponse response, Authentication authentication) {
 
-        String token = AuthenticationUtils.extractTokenFromCookie(request, JwtValidateTokenExpiration::new);
+        String token = AuthenticationUtils.extractTokenFromCookie(request, AuthenticationNotValidException::new);
+        Instant expirationDateTime = tokenManager.getExpiration(token);
 
-        Claims claims = AuthenticationUtils.extractClaimsFromToken(keyPair, token);
-
-        Member member = memberRepository.findById(claims.get("id", Long.class))
-                .orElseThrow(MemberNotFoundException::new);
-
-        JwtBlacklist blacklist = new JwtBlacklist(
-                token
-                ,member
-                ,claims.getExpiration()
-                ,LocalDateTime.now());
+        JwtBlacklist blacklist = new JwtBlacklist(token, authentication.getMemberId(), expirationDateTime, LocalDateTime.now());
 
         jwtBlacklistRepository.save(blacklist);
 

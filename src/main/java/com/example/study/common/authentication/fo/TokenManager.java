@@ -2,16 +2,15 @@ package com.example.study.common.authentication.fo;
 
 import com.example.study.common.util.AuthenticationUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.KeyPair;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,28 +35,37 @@ public class TokenManager {
 
     public Authentication getAuthentication(String jwtToken){
 
-        validateBlacklistAndExpiration(jwtToken);
+        Claims claims = extractClaimsFromToken(jwtToken);
 
-        Claims claims = AuthenticationUtils.extractClaimsFromToken(keyPair, jwtToken);
+        jwtBlacklistRepository.findByJwtHashId(AuthenticationUtils.hashJwtWithSHA256(jwtToken))
+                .ifPresent(blacklist -> {throw new AuthenticationNotValidException();});
 
         Long memberId =  claims.get("id", Long.class);
 
         return new Authentication(memberId);
     }
 
-    /** jwt 유효성 검증 **/
-    private void validateBlacklistAndExpiration(String jwt) {
+    public Instant getExpiration(String token) {
+        Claims claims = extractClaimsFromToken(token);
+        Date exp = claims.getExpiration();
+        return exp.toInstant();
+    }
 
-        Optional<JwtBlacklist> optional = jwtBlacklistRepository.findByJwtHashId(AuthenticationUtils.hashJwtWithSHA256(jwt));
+    /**
+     * 토큰으로부터 Claims을 조회한다. 만료된(expired) 토큰일 경우 예외를 던진다.
+     * @param jwtToken
+     * @return
+     */
+    private Claims extractClaimsFromToken(String jwtToken) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(keyPair.getPublic())
+                    .build()
+                    .parseSignedClaims(jwtToken)
+                    .getPayload();
 
-        if (optional.isEmpty()) {
-            return;
-        }
-
-        LocalDateTime logoutAt = optional.get().getLogoutAt();
-
-        if (logoutAt.isBefore(LocalDateTime.now())) { // check expiredTime
-            throw new JwtValidateTokenExpiration();
+        } catch (JwtException e) {  // JJWT 모든 예외의 상위 타입
+            throw new AuthenticationNotValidException("유효하지 않은 토큰입니다.", e);
         }
     }
 }

@@ -36,7 +36,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             AuthenticationHolder.set(authentication);
             return true;
 
-        } catch (JwtValidateTokenExpiration jwtException) {
+        } catch (AuthenticationNotValidException jwtException) {
 
             response.addHeader("Set-Cookie", AuthenticationUtils.expireLoginCookie());
 

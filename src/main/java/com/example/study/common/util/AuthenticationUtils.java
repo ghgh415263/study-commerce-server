@@ -93,18 +93,4 @@ public class AuthenticationUtils {
                 .orElseThrow(exceptionSupplier);
     }
 
-    /**
-     * 토큰으로부터 Claims을 조회한다.
-     * @param keyPair
-     * @param jwtToken
-     * @return
-     */
-    public static Claims extractClaimsFromToken(KeyPair keyPair, String jwtToken){
-        return Jwts.parser()
-                .verifyWith(keyPair.getPublic())
-                .build()
-                .parseSignedClaims(jwtToken)
-                .getPayload();
-    }
-
 }
