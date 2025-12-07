@@ -2,6 +2,7 @@ package com.example.study.unit;
 
 import com.example.study.common.authentication.JwtConfig;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
+import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.member.command.application.BackofficeMemberLoginDto;
 import com.example.study.member.command.application.BackofficeMemberLoginSaveForm;
 import com.example.study.member.command.application.BackofficeMemberLoginService;
@@ -35,6 +36,9 @@ public class BackofficeMemberLoginControllerTest {
 
     @MockitoBean
     private BackofficeTokenManager backofficeTokenManager;
+
+    @MockitoBean
+    private JwtBlacklistRepository jwtBlacklistRepository; /* JwtConfig.class 대응 */
 
     @Test
     @DisplayName("로그인 폼을 받는다.")

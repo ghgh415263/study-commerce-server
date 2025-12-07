@@ -1,29 +1,27 @@
 package com.example.study.unit;
 
 import com.example.study.common.authentication.JwtConfig;
-import com.example.study.common.authentication.fo.Authentication;
-import com.example.study.common.authentication.fo.AuthenticationConstant;
+import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.common.authentication.fo.TokenManager;
 import com.example.study.member.command.application.MemberLoginService;
+import com.example.study.member.command.domain.MemberRepository;
 import com.example.study.member.ui.MemberLoginController;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.http.MediaType;
 
 @WebMvcTest(MemberLoginController.class)
 @Import(JwtConfig.class)
@@ -37,6 +35,12 @@ class MemberLoginControllerTest {
 
     @MockitoBean
     private TokenManager tokenManager;
+
+    @MockitoBean
+    private MemberRepository memberRepository;
+
+    @MockitoBean
+    private JwtBlacklistRepository jwtBlacklistRepository;
 
     @Test
     @DisplayName("로그인 성공해서 세션에 Authentication가 저장되고 응답은 200")
