@@ -1,5 +1,6 @@
 package com.example.study.member.command.application;
 
+import com.example.study.common.authentication.fo.TokenManager;
 import com.example.study.member.command.domain.Member;
 import com.example.study.member.command.domain.MemberRepository;
 import com.example.study.member.command.domain.PasswordEncoder;
@@ -14,10 +15,14 @@ public class MemberLoginService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public Long login(MemberLoginDto memberLoginDto) {
-        return memberRepository.findByLoginId(memberLoginDto.loginId())
-                .filter(member -> passwordEncoder.isMatch(memberLoginDto.password(), member.getPassword()))
-                .map(Member::getId)
+    private final TokenManager tokenManager;
+
+    public String login(MemberLoginDto memberLoginDto) {
+
+        Member member = memberRepository.findByLoginId(memberLoginDto.loginId())
+                .filter(m -> passwordEncoder.isMatch(memberLoginDto.password(), m.getPassword()))
                 .orElseThrow(InvalidCredentialsException::new);
+
+        return tokenManager.generateToken(member.getId());
     }
 }

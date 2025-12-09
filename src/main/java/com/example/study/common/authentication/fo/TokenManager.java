@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.security.KeyPair;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -45,10 +46,11 @@ public class TokenManager {
         return new Authentication(memberId);
     }
 
-    public Instant getExpiration(String token) {
+    public void expireToken(String token) {
         Claims claims = extractClaimsFromToken(token);
         Date exp = claims.getExpiration();
-        return exp.toInstant();
+        JwtBlacklist blacklist = new JwtBlacklist(token, claims.get("id", Long.class), exp.toInstant(), LocalDateTime.now());
+        jwtBlacklistRepository.save(blacklist);
     }
 
     /**
