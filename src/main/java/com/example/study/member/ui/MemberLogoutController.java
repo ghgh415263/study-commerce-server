@@ -3,30 +3,29 @@ package com.example.study.member.ui;
 import com.example.study.common.ApiSuccessResponse;
 import com.example.study.common.authentication.fo.Authentication;
 import com.example.study.common.authentication.fo.AuthenticationNotValidException;
+import com.example.study.common.authentication.fo.TokenManager;
 import com.example.study.common.util.AuthenticationUtils;
-import com.example.study.member.command.application.MemberWithdrawService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/members")
 @RequiredArgsConstructor
-public class MemberWithdrawController {
+public class MemberLogoutController {
 
-    private final MemberWithdrawService memberWithdrawService;
+    private final TokenManager tokenManager;
 
-    @DeleteMapping
-    public ApiSuccessResponse<Void> withdraw(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping("/logout")
+    public ApiSuccessResponse<Void> logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         String token = AuthenticationUtils.extractTokenFromCookie(request);
-        // 1. 회원 탈퇴 처리
-        memberWithdrawService.withdrawMember(authentication.getMemberId(), token);
+
+        tokenManager.expireToken(token);
 
         response.addHeader(HttpHeaders.SET_COOKIE, AuthenticationUtils.expireLoginCookie());
 

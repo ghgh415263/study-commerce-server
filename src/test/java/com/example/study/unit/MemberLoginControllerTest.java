@@ -46,11 +46,9 @@ class MemberLoginControllerTest {
     @DisplayName("로그인 성공해서 세션에 Authentication가 저장되고 응답은 200")
     void loginSuccessful_tokenCreated_ReturnsSuccess() throws Exception {
         // given
-        long memberId = 1L;
         String token = "mocked-jwt-token";
 
-        given(memberLoginService.login(any())).willReturn(memberId);
-        given(tokenManager.generateToken(memberId)).willReturn(token);
+        given(memberLoginService.login(any())).willReturn(token);
 
         // when
         MvcResult result = mockMvc.perform(post("/login")

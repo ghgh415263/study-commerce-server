@@ -28,8 +28,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String token = AuthenticationUtils.extractTokenFromCookie(request,
-                () -> new UnauthenticatedException("토큰이 없습니다."));
+        String token = AuthenticationUtils.extractTokenFromCookie(request);
 
         try {
             Authentication authentication = tokenManager.getAuthentication(token);

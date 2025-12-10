@@ -1,6 +1,7 @@
 package com.example.study.common.util;
 
 import com.example.study.common.authentication.fo.AuthenticationConstant;
+import com.example.study.common.authentication.fo.AuthenticationNotValidException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
@@ -50,7 +51,7 @@ public class AuthenticationUtils {
      * @param token
      * @return
      */
-    public static String generateLoingCookie (String token){
+    public static String generateLoingCookie(String token) {
         return  ResponseCookie.from(AuthenticationConstant.TOKEN_COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(true)
@@ -65,7 +66,7 @@ public class AuthenticationUtils {
      * 로그인 쿠키 만료
      * @return
      */
-    public static String expireLoginCookie(){
+    public static String expireLoginCookie() {
         return ResponseCookie.from(AuthenticationConstant.TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(true)
@@ -79,18 +80,21 @@ public class AuthenticationUtils {
     /**
      * 쿠키로부터 COOKIE_NAME에 해당하는 token을 조회한다.
      * @param request
-     * @param exceptionSupplier
      * @return
      */
     public static String extractTokenFromCookie(
             HttpServletRequest request
-            , Supplier<? extends RuntimeException> exceptionSupplier
-    ){
-        return Arrays.stream(request.getCookies())
+    ) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new AuthenticationNotValidException();
+        }
+
+        return Arrays.stream(cookies)
                 .filter(c -> AuthenticationConstant.TOKEN_COOKIE_NAME.equals(c.getName()))
                 .map(Cookie::getValue)
                 .findFirst()
-                .orElseThrow(exceptionSupplier);
+                .orElseThrow(AuthenticationNotValidException::new);
     }
 
 }
