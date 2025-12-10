@@ -53,3 +53,6 @@ management:
     tags:
       application: study-commerce-server
 
+file:
+  review-image-dir: ${user.home}/Desktop/review-images/
+
