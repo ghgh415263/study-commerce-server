@@ -17,6 +17,9 @@ spring:
         show_sql: false
         format_sql: true                        # 출력되는 SQL 쿼리를 보기 좋게 포맷팅
         highlight_sql: true                     # 콘솔에서 SQL 쿼리를 하이라이트 처리 (색상)
+        jdbc:
+          batch_size: 50   # 배치 사이즈 (업데이트/삭제 배치)
+        order_updates: true        # UPDATE 정렬 (배치 효율 증가)
 
   thymeleaf:
     encoding: UTF-8

@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.domain;
+package com.example.study.order.payment;
 
 import com.example.study.common.persistance.BaseUpdateEntity;
 import jakarta.persistence.*;
@@ -22,7 +22,7 @@ public class Payment extends BaseUpdateEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Long OrderId;
+    private Long orderId;
 
     // 결제 금액
     @Column(nullable = false)
@@ -36,11 +36,15 @@ public class Payment extends BaseUpdateEntity {
     @Column(nullable = false)
     private LocalDateTime paidAt;
 
-    public Payment(BigDecimal amount, LocalDateTime paidAt, Long OrderId) {
+    public Payment(BigDecimal amount, LocalDateTime paidAt, Long orderId) {
         this.amount = amount;
         this.status = PaymentStatus.COMPLETED;
         this.paidAt = paidAt;
-        this.OrderId = OrderId;
+        this.orderId = orderId;
+    }
+
+    public void cancel(){
+        this.status = PaymentStatus.CANCELED;
     }
 
 }

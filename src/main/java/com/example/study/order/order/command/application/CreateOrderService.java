@@ -1,6 +1,11 @@
 package com.example.study.order.order.command.application;
 
 import com.example.study.order.order.command.domain.*;
+import com.example.study.order.payment.Payment;
+import com.example.study.order.payment.PaymentRepository;
+import com.example.study.order.wallet.Wallet;
+import com.example.study.order.wallet.WalletNotFoundException;
+import com.example.study.order.wallet.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,7 +86,7 @@ public class CreateOrderService {
 
         // 배송형 상품이 존재하면 배송 생성
         if (!deliveryItems.isEmpty()) {
-            Delivery delivery = new Delivery(DeliveryStatus.NOT_STARTED, dto.delivery().address(), dto.delivery().contact());
+            Delivery delivery = new Delivery(dto.delivery().address(), dto.delivery().contact(), order.getId());
             List<Long> deliveryOrderItemIds = deliveryItems.stream()
                     .map(OrderItem::getId)
                     .toList();

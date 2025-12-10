@@ -64,4 +64,22 @@ public class Order extends BaseUpdateEntity {
                 )
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    private boolean isCancelable() {
+        if (orderStatus != OrderStatus.CREATED) {
+            return false;
+        }
+
+        boolean containsCoupon = orderItems.stream()
+                .anyMatch(OrderItem::isCoupon);
+        return !containsCoupon;
+    }
+
+    public void cancel(){
+        if (!isCancelable()) {
+            throw new InvalidOrderStateException("현재 주문은 취소할 수 없습니다.");
+        }
+        // 2) 상태 변경
+        this.orderStatus = OrderStatus.CANCELLED;
+    }
 }

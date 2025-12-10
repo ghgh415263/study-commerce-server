@@ -1,4 +1,4 @@
-package com.example.study.order.order.command.domain;
+package com.example.study.order.wallet;
 
 import com.example.study.common.InvalidArgumentException;
 import jakarta.persistence.*;
