@@ -3,7 +3,7 @@ package com.example.study.product.command.application.review;
 import com.example.study.common.file.FileStoreClient;
 import com.example.study.product.command.domain.review.Review;
 import com.example.study.product.command.domain.review.ReviewImage;
-import com.example.study.product.command.domain.review.ReviewImageRepository;
+import com.example.study.product.command.domain.review.ReviewImageBulkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +17,7 @@ import java.util.Objects;
 public class ReviewImageService {
 
     private final FileStoreClient fileStoreClient;
-    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewImageBulkRepository reviewImageBulkRepository;
 
     /**
      * 리뷰 이미지 파일 저장 & DB 저장
@@ -47,7 +47,7 @@ public class ReviewImageService {
         }
 
         if (!reviewImages.isEmpty()) { // Save bulk reviewImage list
-            reviewImageRepository.saveAll(reviewImages);
+            reviewImageBulkRepository.saveAll(reviewImages);
         }
     }
 
