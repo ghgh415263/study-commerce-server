@@ -39,13 +39,13 @@ public class LocalFileStoreClientReview implements FileStoreClient {
      * @param file
      * @return
      */
-    public String store(MultipartFile file) {
+    public String store( UUID uploadFileId, MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("빈 파일입니다.");
         }
 
         String originalFilename = file.getOriginalFilename();
-        String storedFileName = createStoredFileName(originalFilename);
+        String storedFileName = createStoredFileName(originalFilename,uploadFileId); // UUID + . + 확장자
 
         try {
             file.transferTo(new File(getFullPath(storedFileName)));
@@ -60,10 +60,9 @@ public class LocalFileStoreClientReview implements FileStoreClient {
         return reviewImageDir + fileName;
     }
 
-    private String createStoredFileName(String originalFilename) {
+    private String createStoredFileName(String originalFilename, UUID uploadFileId) {
         String ext = extractExt(originalFilename);
-        String uuid = UUID.randomUUID().toString();
-        return uuid + "." + ext;
+        return uploadFileId.toString() + "." + ext;
     }
 
     private String extractExt(String originalFilename) {

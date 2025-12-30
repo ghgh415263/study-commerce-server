@@ -8,7 +8,6 @@ import com.example.study.product.command.domain.review.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,11 +25,10 @@ public class ReviewService {
      * 리뷰 저장
      * @param memberId
      * @param dto
-     * @param images
      * @return
      */
     @Transactional
-    public Long saveReview(Long memberId , ReviewRequestDto dto, List<MultipartFile> images){
+    public Long saveReview(Long memberId, ReviewCreateRequestDto dto){
 
         // 1) 텍스트 저장
         Product product = productRepository.findById(dto.productId()).orElseThrow(ProductNotFoundException::new);
@@ -38,8 +36,9 @@ public class ReviewService {
         Long saveReviewId = reviewRepository.save(review).getId();
 
         // 2) 이미지 저장
-        if(images != null && !images.isEmpty()) {
-            reviewImageService.saveReviewImages(review, images);
+        List<String> uploadReviewImageFileNames = dto.uploadReviewImageFileNames();
+        if(uploadReviewImageFileNames != null && !uploadReviewImageFileNames.isEmpty()) {
+            reviewImageService.saveReviewImages(review, uploadReviewImageFileNames);
         }
 
         return saveReviewId;
@@ -53,7 +52,7 @@ public class ReviewService {
      * @return
      */
     @Transactional
-    public Long updateReview(Long memberId, Long reviewId, ReviewRequestDto dto, List<Long> deleteImageIds, List<MultipartFile> newImages){
+    public Long updateReview(Long memberId, Long reviewId, ReviewUpdateRequestDto dto){
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
 
@@ -65,10 +64,10 @@ public class ReviewService {
         review.update(dto.content(), dto.star());
 
         // 2) 이미지 삭제
-        if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
-            List<ReviewImage> imagesToDelete = reviewImageRepository.findAllById(deleteImageIds);
+        if (dto.deleteImageIds() != null && !dto.deleteImageIds().isEmpty()) {
+            List<ReviewImage> imagesToDelete = reviewImageRepository.findAllById(dto.deleteImageIds());
 
-            reviewImageService.deleteReviewImages(review, deleteImageIds); // DB 삭제
+            reviewImageService.deleteReviewImages(review, dto.deleteImageIds()); // DB 삭제
 
             for (ReviewImage image : imagesToDelete) {
                 fileStoreClient.delete(image.getStoredFileName()); // 서버 파일 삭제
@@ -76,8 +75,8 @@ public class ReviewService {
         }
 
         // 3) 새 이미지 추가
-        if (newImages != null && !newImages.isEmpty()) {
-            reviewImageService.saveReviewImages(review, newImages);
+        if (dto.uploadReviewImageFileNames() != null && !dto.uploadReviewImageFileNames().isEmpty()) {
+            reviewImageService.saveReviewImages(review, dto.uploadReviewImageFileNames());
         }
 
         return review.getId();
@@ -93,11 +92,11 @@ public class ReviewService {
         if (!review.getMemberId().equals(memberId)){
             throw new InvalidReviewAuthenticationException();
         }
-
-        // DB 삭제
+        
+        // 텍스트 삭제
         reviewRepository.delete(review);
 
-        // 리뷰 이미지 파일 삭제
+        // 이미지 파일 삭제
         for (ReviewImage image : review.getImages()) {
             fileStoreClient.delete(image.getStoredFileName());
         }

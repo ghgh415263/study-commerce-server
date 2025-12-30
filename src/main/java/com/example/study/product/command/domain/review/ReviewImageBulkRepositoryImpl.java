@@ -24,17 +24,16 @@ public class ReviewImageBulkRepositoryImpl implements ReviewImageBulkRepository 
 
         String sql = """
             INSERT INTO review_image (
-                created_by, modified_by, original_file_name, stored_file_name, review_id
+                created_by, modified_by, stored_file_name, review_id
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?)
             """;
 
         jdbcTemplate.batchUpdate(sql, reviewImages, reviewImages.size(), (ps, reviewImage) -> {
             ps.setString(1, currentAuditor); // created_by
             ps.setString(2, currentAuditor); // modified_by
-            ps.setString(3, reviewImage.getOriginalFileName());
-            ps.setString(4, reviewImage.getStoredFileName());
-            ps.setObject(5, reviewImage.getReview().getId());
+            ps.setString(3, reviewImage.getStoredFileName());
+            ps.setObject(4, reviewImage.getReview().getId());
         });
     }
 }

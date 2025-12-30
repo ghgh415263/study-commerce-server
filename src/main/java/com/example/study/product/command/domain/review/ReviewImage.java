@@ -20,18 +20,15 @@ public class ReviewImage extends BaseUpdateEntity  {
     private Review review;
 
     @Column(nullable = false)
-    private String originalFileName;
-
-    @Column(nullable = false)
     private String storedFileName;
 
-    public ReviewImage(Review review, String originalFileName, String storedFileName) {
+    public ReviewImage(Review review, String storedFileName) {
         this.review = review;
-        this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
     }
 
     protected void setReview(Review review) {
         this.review = review;
     }
+
 }

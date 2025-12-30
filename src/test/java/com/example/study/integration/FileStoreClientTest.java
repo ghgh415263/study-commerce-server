@@ -10,6 +10,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -33,7 +34,7 @@ class FileStoreClientTest {
         );
 
         // when
-        String storedFileName = FileStoreClient.store(file);
+        String storedFileName = FileStoreClient.store(UUID.randomUUID(), file);
 
         // then
         Path savedPath = Paths.get(
@@ -46,7 +47,7 @@ class FileStoreClientTest {
     }
 
     @Test
-    void 파일이_삭제된다() throws Exception {
+    void 파일이_삭제된다() {
         // given
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -55,7 +56,7 @@ class FileStoreClientTest {
                 "hello".getBytes()
         );
 
-        String storedFileName = FileStoreClient.store(file);
+        String storedFileName = FileStoreClient.store(UUID.randomUUID(), file);
 
         Path savedPath = Paths.get(
                 System.getProperty("java.io.tmpdir"),
