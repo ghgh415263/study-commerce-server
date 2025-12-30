@@ -6,6 +6,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -30,6 +34,10 @@ public class Review extends BaseUpdateEntity {
     @Column(nullable = false)
     private int star;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @NotAudited
+    private List<ReviewImage> images = new ArrayList<>();
+
     public Review(Long memberId, Long productId, String content, int star){
         this.memberId = memberId;
         this.productId = productId;
@@ -40,5 +48,15 @@ public class Review extends BaseUpdateEntity {
     public void update(String content, int star){
         this.content = content;
         this.star = star;
+    }
+
+    public void addImage(ReviewImage image) {
+        images.add(image);
+        image.setReview(this);
+    }
+
+    public void removeImage(ReviewImage image) {
+        images.remove(image);
+        image.setReview(null);
     }
 }
