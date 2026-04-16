@@ -1,6 +1,7 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
+import com.example.study.common.authentication.HttpCookieManager;
 import com.example.study.common.util.AuthenticationUtils;
 import com.example.study.member.command.application.MemberLoginDto;
 import com.example.study.member.command.application.MemberLoginService;
@@ -18,6 +19,8 @@ public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
 
+    private final HttpCookieManager httpCookieManager;
+
     @PostMapping("/login")
     public ApiSuccessResponse<Void> login(
             @Valid @RequestBody MemberLoginDto dto,
@@ -25,7 +28,7 @@ public class MemberLoginController {
 
         String token = memberLoginService.login(dto);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, AuthenticationUtils.generateLoingCookie(token));
+        response.addHeader(HttpHeaders.SET_COOKIE, httpCookieManager.generateLoginCookie(token));
 
         return ApiSuccessResponse.empty();
     }

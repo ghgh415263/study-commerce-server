@@ -2,14 +2,18 @@ package com.example.study.unit;
 
 import com.example.study.common.authentication.JwtConfig;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
+import com.example.study.common.authentication.fo.AuthenticationConfig;
 import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.member.command.application.BackofficeMemberLoginService;
 import com.example.study.member.test.TestBackofficeMemberLoginController;
+import com.example.study.member.ui.backoffice.BackofficeMemberLoginController;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,8 +27,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TestBackofficeMemberLoginController.class)
-@Import(JwtConfig.class)
+@WebMvcTest(
+        controllers = TestBackofficeMemberLoginController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = AuthenticationConfig.class
+        )
+)
 public class TestBackofficeMemberLoginControllerTest {
 
     @Autowired
@@ -35,9 +44,6 @@ public class TestBackofficeMemberLoginControllerTest {
 
     @MockitoBean
     private BackofficeTokenManager backofficeTokenManager;
-
-    @MockitoBean
-    private JwtBlacklistRepository jwtBlacklistRepository; /* JwtConfig.class 대응 */
 
     @Test
     @DisplayName("로그인 성공 시 토큰생성되고 응답은 200")

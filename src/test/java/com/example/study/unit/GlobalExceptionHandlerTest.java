@@ -2,10 +2,14 @@ package com.example.study.unit;
 
 import com.example.study.common.GlobalExceptionHandler;
 import com.example.study.common.authentication.JwtConfig;
+import com.example.study.common.authentication.fo.AuthenticationConfig;
 import com.example.study.common.authentication.fo.JwtBlacklistRepository;
+import com.example.study.member.ui.backoffice.BackofficeMemberLoginController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,15 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@WebMvcTest(controllers =  TestController.class)
-@Import({GlobalExceptionHandler.class, JwtConfig.class})
+@WebMvcTest(
+        controllers = TestController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = AuthenticationConfig.class
+        )
+)
+@Import({GlobalExceptionHandler.class})
 public class GlobalExceptionHandlerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private JwtBlacklistRepository jwtBlacklistRepository; /* JwtConfig.class 대응 */
 
     @Test
     void generalExceptionReturnsJsonString() throws Exception {

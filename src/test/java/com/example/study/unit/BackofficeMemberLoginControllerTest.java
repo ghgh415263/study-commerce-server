@@ -1,7 +1,7 @@
 package com.example.study.unit;
 
-import com.example.study.common.authentication.JwtConfig;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
+import com.example.study.common.authentication.fo.AuthenticationConfig;
 import com.example.study.common.authentication.fo.JwtBlacklistRepository;
 import com.example.study.member.command.application.BackofficeMemberLoginDto;
 import com.example.study.member.command.application.BackofficeMemberLoginSaveForm;
@@ -12,7 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,8 +25,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BackofficeMemberLoginController.class)
-@Import(JwtConfig.class)
+@WebMvcTest(
+        controllers = BackofficeMemberLoginController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = AuthenticationConfig.class
+        )
+)
 public class BackofficeMemberLoginControllerTest {
 
     @Autowired
@@ -36,9 +42,6 @@ public class BackofficeMemberLoginControllerTest {
 
     @MockitoBean
     private BackofficeTokenManager backofficeTokenManager;
-
-    @MockitoBean
-    private JwtBlacklistRepository jwtBlacklistRepository; /* JwtConfig.class 대응 */
 
     @Test
     @DisplayName("로그인 폼을 받는다.")
