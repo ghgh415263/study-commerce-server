@@ -1,20 +1,12 @@
 package com.example.study.common.util;
 
 import com.example.study.common.authentication.fo.AuthenticationConstant;
-import com.example.study.common.authentication.fo.AuthenticationNotValidException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseCookie;
 
 import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.function.Supplier;
 
 /** jwt 인증 관련 유틸 함수 **/
 public class AuthenticationUtils {
@@ -44,57 +36,6 @@ public class AuthenticationUtils {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 algorithm not found", e);
         }
-    }
-
-    /**
-     * 로그인 쿠키 생성
-     * @param token
-     * @return
-     */
-    public static String generateLoingCookie(String token) {
-        return  ResponseCookie.from(AuthenticationConstant.TOKEN_COOKIE_NAME, token)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(Duration.ofMinutes(30))
-                .build()
-                .toString();
-    }
-
-    /**
-     * 로그인 쿠키 만료
-     * @return
-     */
-    public static String expireLoginCookie() {
-        return ResponseCookie.from(AuthenticationConstant.TOKEN_COOKIE_NAME, "")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(0)
-                .build()
-                .toString();
-    }
-
-    /**
-     * 쿠키로부터 COOKIE_NAME에 해당하는 token을 조회한다.
-     * @param request
-     * @return
-     */
-    public static String extractTokenFromCookie(
-            HttpServletRequest request
-    ) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            throw new AuthenticationNotValidException();
-        }
-
-        return Arrays.stream(cookies)
-                .filter(c -> AuthenticationConstant.TOKEN_COOKIE_NAME.equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElseThrow(AuthenticationNotValidException::new);
     }
 
 }

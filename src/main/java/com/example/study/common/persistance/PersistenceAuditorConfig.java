@@ -43,7 +43,7 @@ public class PersistenceAuditorConfig {
         public Optional<String> getCurrentAuditor() {
 
             Authentication authentication = AuthenticationHolder.get();
-            if (authentication != null) {
+            if (authentication != null && !authentication.isAnonymous()) {
                 return Optional.of(authentication.getMemberId().toString());
             }
 

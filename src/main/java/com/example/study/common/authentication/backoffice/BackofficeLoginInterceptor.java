@@ -1,5 +1,6 @@
 package com.example.study.common.authentication.backoffice;
 
+import com.example.study.common.authentication.HttpCookieManager;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,10 +33,12 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
 
     private final BackofficeTokenManager backofficeTokenManager;
 
+    private final HttpCookieManager httpCookieManager;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String token = extractTokenFromCookie(request);
+        String token = httpCookieManager.getCookieValueOrNull(request, BACKOFFICE_AUTHENTICATION);
 
         if (token == null) {
             redirectToLoginPage(response);
@@ -52,20 +55,6 @@ public class BackofficeLoginInterceptor implements HandlerInterceptor {
             redirectToLoginPage(response);
             return false;
         }
-    }
-
-    @Nullable
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            return null;
-        }
-
-        for (Cookie cookie : request.getCookies()) {
-            if (BACKOFFICE_AUTHENTICATION.equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
     }
 
     private void redirectToLoginPage(HttpServletResponse response) {

@@ -1,10 +1,8 @@
 package com.example.study.member.ui;
 
 import com.example.study.common.ApiSuccessResponse;
-import com.example.study.common.authentication.fo.Authentication;
-import com.example.study.common.authentication.fo.AuthenticationNotValidException;
-import com.example.study.common.authentication.fo.TokenManager;
-import com.example.study.common.util.AuthenticationUtils;
+import com.example.study.common.authentication.HttpCookieManager;
+import com.example.study.common.authentication.fo.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +16,19 @@ public class MemberLogoutController {
 
     private final TokenManager tokenManager;
 
+    private final HttpCookieManager httpCookieManager;
+
     @PostMapping("/logout")
     public ApiSuccessResponse<Void> logout(
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        String token = AuthenticationUtils.extractTokenFromCookie(request);
+        String token = httpCookieManager.getCookieValue(request, AuthenticationConstant.TOKEN_COOKIE_NAME)
+                .orElseThrow(UnauthenticatedException::new);
 
         tokenManager.expireToken(token);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, AuthenticationUtils.expireLoginCookie());
+        response.addHeader(HttpHeaders.SET_COOKIE, httpCookieManager.expireLoginCookie(AuthenticationConstant.TOKEN_COOKIE_NAME));
 
         return ApiSuccessResponse.empty();
     }

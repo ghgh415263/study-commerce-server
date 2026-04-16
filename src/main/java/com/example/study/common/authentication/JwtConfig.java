@@ -2,9 +2,11 @@ package com.example.study.common.authentication;
 
 import com.example.study.common.authentication.backoffice.BackofficeLoginInterceptor;
 import com.example.study.common.authentication.backoffice.BackofficeTokenManager;
+import com.example.study.common.authentication.fo.AuthenticationInterceptor;
 import com.example.study.common.authentication.fo.JwtBlacklistRepository;
-import com.example.study.common.authentication.fo.LoginInterceptor;
+import com.example.study.common.authentication.fo.FoLoginInterceptor;
 import com.example.study.common.authentication.fo.TokenManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,14 +14,13 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
+@RequiredArgsConstructor
 @Configuration
 public class JwtConfig {
 
     private final JwtBlacklistRepository jwtBlacklistRepository;
 
-    public JwtConfig(JwtBlacklistRepository jwtBlacklistRepository) {
-        this.jwtBlacklistRepository = jwtBlacklistRepository;
-    }
+    private final HttpCookieManager httpCookieManager;
 
     @Bean
     public KeyPair localKeyPair() {
@@ -43,12 +44,17 @@ public class JwtConfig {
     }
 
     @Bean
-    public LoginInterceptor loginInterceptor() {
-        return new LoginInterceptor(tokenManager());
+    public FoLoginInterceptor foLoginInterceptor() {
+        return new FoLoginInterceptor();
     }
 
     @Bean
     public BackofficeLoginInterceptor backofficeLoginInterceptor() {
-        return new BackofficeLoginInterceptor(backofficeTokenManager());
+        return new BackofficeLoginInterceptor(backofficeTokenManager(), httpCookieManager);
+    }
+
+    @Bean
+    public AuthenticationInterceptor authenticationInterceptor(){
+        return new AuthenticationInterceptor(tokenManager(), httpCookieManager);
     }
 }

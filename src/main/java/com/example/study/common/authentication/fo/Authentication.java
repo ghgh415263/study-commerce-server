@@ -13,4 +13,12 @@ public class Authentication {
     public Authentication(Long memberId) {
         this.memberId = memberId;
     }
+
+    public boolean isAnonymous() {
+        return memberId == null;
+    }
+
+    public static Authentication createAnonymousAuthentication(){
+        return new Authentication(null);
+    }
 }

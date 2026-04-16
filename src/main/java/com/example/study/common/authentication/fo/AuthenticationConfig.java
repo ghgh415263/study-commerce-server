@@ -21,12 +21,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationConfig implements WebMvcConfigurer {
 
-    private final LoginInterceptor loginInterceptor;
+    private final FoLoginInterceptor foLoginInterceptor;
     private final BackofficeLoginInterceptor backofficeLoginInterceptor;
+    private final AuthenticationInterceptor authenticationInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginInterceptor)
+
+        registry.addInterceptor(authenticationInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/backoffice/**");
+
+        registry.addInterceptor(foLoginInterceptor)
                 .addPathPatterns("/members/**", "/orders/**", "/reviews/**", "/products/*/reviews", "/logout");
 
         registry.addInterceptor(backofficeLoginInterceptor)
